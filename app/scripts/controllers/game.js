@@ -28,6 +28,7 @@ angular.module('nerdproxyApp')
 
     function zoomOut() {
       stuff.zoomFactor /= 1.5;
+      stuff.zoomFactor = Math.max(stuff.zoomFactor, 1);
     }
 
   });

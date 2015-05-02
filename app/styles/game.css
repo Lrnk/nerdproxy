@@ -5,14 +5,18 @@
 }
 
 .game-view-wrapper {
-  width: 100%;
-  padding-bottom: 66.67%;
+  /*width: 100%;*/
+  /*padding-bottom: 66.67%;*/
+
+  width: 1000px;
+  height: 666px;
+
   position: relative;
   overflow: hidden;
 }
 
 .game-view-scroller {
-  padding-bottom: 66.67%;
+  /*padding-bottom: 66.67%;  todo put responsiveness back in*/
   position: absolute;
   overflow: hidden;
 }
