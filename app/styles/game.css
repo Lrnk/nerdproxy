@@ -25,6 +25,11 @@ svg.game-entities {
   left: 0;
 }
 
-.inf {
 
+.model {
+  stroke: black;
+  fill: green;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
 }
+
