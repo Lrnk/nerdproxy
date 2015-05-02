@@ -9,9 +9,25 @@
  */
 angular.module('nerdproxyApp')
   .controller('GameCtrl', function ($scope) {
-    $scope.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
+
+    var stuff = {
+      zoomFactor: 1
+    };
+
+    angular.extend($scope, {
+
+      stuff: stuff,
+
+      zoomIn: zoomIn,
+      zoomOut: zoomOut
+    });
+
+    function zoomIn() {
+      stuff.zoomFactor *= 1.5;
+    }
+
+    function zoomOut() {
+      stuff.zoomFactor /= 1.5;
+    }
+
   });
