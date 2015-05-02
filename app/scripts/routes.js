@@ -77,6 +77,10 @@ angular.module('nerdproxyApp')
         controller: 'AccountCtrl'
       })
 
+      .when('/game', {
+        templateUrl: 'views/game.html',
+        controller: 'GameCtrl'
+      })
       .otherwise({redirectTo: '/'});
   }])
 
