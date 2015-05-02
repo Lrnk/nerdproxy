@@ -1,0 +1,20 @@
+.game-view {
+  width: 100%;
+  max-width: 1000px;
+  margin: auto;
+  position: relative;
+}
+
+.map {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+}
+
+svg.game {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
