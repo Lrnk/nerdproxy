@@ -8,19 +8,19 @@
  */
 angular.module('nerdproxyApp')
   .controller('LoginCtrl', function ($scope, Auth, $location, $q, Ref, $timeout) {
-    $scope.passwordLogin = function(email, pass) {
+    $scope.passwordLogin = function (email, pass) {
       $scope.err = null;
       Auth.$authWithPassword({email: email, password: pass}, {rememberMe: true}).then(
         redirect, showError
       );
     };
 
-    $scope.createAccount = function(email, pass, confirm) {
+    $scope.createAccount = function (email, pass, confirm) {
       $scope.err = null;
-      if( !pass ) {
+      if (!pass) {
         $scope.err = 'Please enter a password';
       }
-      else if( pass !== confirm ) {
+      else if (pass !== confirm) {
         $scope.err = 'Passwords do not match';
       }
       else {
@@ -35,9 +35,9 @@ angular.module('nerdproxyApp')
 
       function createProfile(user) {
         var ref = Ref.child('users', user.uid), def = $q.defer();
-        ref.set({email: email, name: firstPartOfEmail(email)}, function(err) {
-          $timeout(function() {
-            if( err ) {
+        ref.set({email: email, name: firstPartOfEmail(email)}, function (err) {
+          $timeout(function () {
+            if (err) {
               def.reject(err);
             }
             else {
@@ -50,17 +50,16 @@ angular.module('nerdproxyApp')
     };
 
     function firstPartOfEmail(email) {
-      return ucfirst(email.substr(0, email.indexOf('@'))||'');
+      return ucfirst(email.substr(0, email.indexOf('@')) || '');
     }
 
-    function ucfirst (str) {
+    function ucfirst(str) {
       // inspired by: http://kevin.vanzonneveld.net
       str += '';
       var f = str.charAt(0).toUpperCase();
       return f + str.substr(1);
     }
 
-  
 
     function redirect() {
       $location.path('/account');

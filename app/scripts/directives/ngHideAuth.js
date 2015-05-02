@@ -1,4 +1,3 @@
-
 /**
  * @ngdoc function
  * @name nerdproxyApp.directive:ngHideAuth
@@ -13,7 +12,7 @@ angular.module('nerdproxyApp')
 
     return {
       restrict: 'A',
-      link: function(scope, el) {
+      link: function (scope, el) {
         el.addClass('ng-cloak'); // hide until we process it
         function update() {
           // sometimes if ngCloak exists on same element, they argue, so make sure that

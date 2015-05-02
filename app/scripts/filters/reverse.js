@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('nerdproxyApp')
-  .filter('reverse', function() {
-    return function(items) {
-      return angular.isArray(items)? items.slice().reverse() : [];
+  .filter('reverse', function () {
+    return function (items) {
+      return angular.isArray(items) ? items.slice().reverse() : [];
     };
   });

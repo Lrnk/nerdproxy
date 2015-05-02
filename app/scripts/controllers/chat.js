@@ -15,8 +15,8 @@ angular.module('nerdproxyApp')
     $scope.messages.$loaded().catch(alert);
 
     // provide a method for adding a message
-    $scope.addMessage = function(newMessage) {
-      if( newMessage ) {
+    $scope.addMessage = function (newMessage) {
+      if (newMessage) {
         // push a message to the end of the array
         $scope.messages.$add({text: newMessage})
           // display any errors
@@ -26,7 +26,7 @@ angular.module('nerdproxyApp')
 
     function alert(msg) {
       $scope.err = msg;
-      $timeout(function() {
+      $timeout(function () {
         $scope.err = null;
       }, 5000);
     }

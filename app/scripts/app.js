@@ -9,11 +9,11 @@
  * Main module of the application.
  */
 angular.module('nerdproxyApp', [
-    'ngResource',
-    'ngRoute',
-    'ngSanitize',
-    'ngTouch',
-    'firebase',
-    'firebase.ref',
-    'firebase.auth'
-  ]);
+  'ngResource',
+  'ngRoute',
+  'ngSanitize',
+  'ngTouch',
+  'firebase',
+  'firebase.ref',
+  'firebase.auth'
+]);
