@@ -1,18 +1,15 @@
 .game {
-  width: 100%;
-  max-width: 1000px;
-  margin: auto;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .game-view-wrapper {
-  /*width: 100%;*/
-  /*padding-bottom: 66.67%;*/
-
-  width: 1000px;
-  height: 666px;
-
   position: relative;
   overflow: hidden;
+  margin: auto;
 }
 
 .game-view-scroller {
