@@ -40,3 +40,10 @@ svg.game-entities {
   vector-effect: non-scaling-stroke;
 }
 
+
+.range-line {
+  stroke: red;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+

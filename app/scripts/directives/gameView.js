@@ -17,6 +17,7 @@ angular.module('nerdproxyApp')
         // init
 
         var stuff = scope.stuff;
+        var gameSnap = Snap('.game-entities');
 
         element.find('svg')[0].setAttribute('viewBox', '0 0 ' + stuff.boardWidthCm + ' ' + stuff.boardHeightCm);
 
@@ -66,13 +67,11 @@ angular.module('nerdproxyApp')
 
         function refreshState() {
 
-          $timeout(function() {
-            var s = Snap('.game-entities');
-
-            s.clear();
+          $timeout(function () {
+            gameSnap.clear();
 
             angular.forEach(scope.state.models, function (model, modelId) {
-              var thisCircle = s.circle(model.xCm, model.yCm, 1.25);
+              var thisCircle = gameSnap.circle(model.xCm, model.yCm, 1.25);
               thisCircle.addClass('model inf');
               thisCircle.attr('data-model-id', modelId);
             });
@@ -80,57 +79,110 @@ angular.module('nerdproxyApp')
           })
         }
 
-        // Moving models
 
-        var startPageXPx;
-        var startPageYPx;
-        var startModelXCm;
-        var startModelYCm;
-        var $model;
-        var modelId;
+        (function initModelMovingStuff() {
 
-        $document.on('mousedown', function (e) {
+          var startPageXPx;
+          var startPageYPx;
+          var startModelXCm;
+          var startModelYCm;
+          var $model;
+          var modelId;
 
-          if (e.target.tagName !== 'circle') {
-            return;
+          $document.on('mousedown', function modelMouseDown(e) {
+
+            if (e.target.tagName !== 'circle') {
+              return;
+            }
+
+            startPageXPx = e.pageX;
+            startPageYPx = e.pageY;
+            $model = angular.element(e.target);
+            modelId = $model.data('modelId');
+            startModelXCm = $window.parseInt($model.attr('cx'));
+            startModelYCm = $window.parseInt($model.attr('cy'));
+
+
+            $document.on('mousemove', modelMouseMove);
+            $document.on('mouseup', modelMouseUp);
+
+          });
+
+          function modelMouseMove(e) {
+
+            var posChangeXPx = startPageXPx - e.pageX;
+            var posChangeYPx = startPageYPx - e.pageY;
+
+            $model.attr('cx', startModelXCm - scope.pxToCm(posChangeXPx));
+            $model.attr('cy', startModelYCm - scope.pxToCm(posChangeYPx));
           }
 
-          startPageXPx = e.pageX;
-          startPageYPx = e.pageY;
-          $model = angular.element(e.target);
-          modelId = $model.data('modelId');
-          startModelXCm = $window.parseInt($model.attr('cx'));
-          startModelYCm = $window.parseInt($model.attr('cy'));
+          function modelMouseUp() {
+
+            // update state
+            scope.state.models[modelId].xCm = $model.attr('cx');
+            scope.state.models[modelId].yCm = $model.attr('cy');
+            scope.saveState();
 
 
-          $document.on('mousemove', modelMouseMove);
-          $document.on('mouseup', modelMouseUp);
+            // end move
+            $model = undefined;
+            $document.off('mousemove', modelMouseMove);
+            $document.off('mouseup', modelMouseUp);
 
-        });
+          }
 
-        function modelMouseMove(e) {
+        })();
 
-          var posChangeXPx = startPageXPx - e.pageX;
-          var posChangeYPx = startPageYPx - e.pageY;
+        (function initRangeCheckingStuff() {
 
-          $model.attr('cx', startModelXCm - scope.pxToCm(posChangeXPx));
-          $model.attr('cy', startModelYCm - scope.pxToCm(posChangeYPx));
-        }
+          var startPageXPx;
+          var startPageYPx;
+          var rangeLine;
+          var leftOffset;
+          var topOffset;
 
-        function modelMouseUp() {
+          $document.on('mousedown', function rangeCheckMouseDown(e) {
 
-          // update state
-          scope.state.models[modelId].xCm = $model.attr('cx');
-          scope.state.models[modelId].yCm = $model.attr('cy');
-          scope.saveState();
+            //if (!scope.rangeCheckModeOn) {
+            //  return;
+            //}
+
+            leftOffset = element[0].offsetLeft;
+            topOffset = element[0].offsetTop;
+
+            startPageXPx = e.pageX - leftOffset;
+            startPageYPx = e.pageY - topOffset;
+
+            rangeLine = gameSnap.line(scope.pxToCm(startPageXPx), scope.pxToCm(startPageYPx), scope.pxToCm(startPageXPx), scope.pxToCm(startPageYPx));
+            rangeLine.addClass('range-line');
+
+            $document.on('mousemove', rangeCheckMouseMove);
+            $document.on('mouseup', rangeCheckMouseUp);
+
+          });
+
+          function rangeCheckMouseMove(e) {
+
+            var posChangeXPx = startPageXPx - (e.pageX - leftOffset);
+            var posChangeYPx = startPageYPx - (e.pageY - topOffset);
+
+            rangeLine.attr({
+              x2: scope.pxToCm(startPageXPx) - scope.pxToCm(posChangeXPx),
+              y2: scope.pxToCm(startPageYPx) - scope.pxToCm(posChangeYPx)
+            });
+          }
+
+          function rangeCheckMouseUp() {
+            // end move
+            scope.rangeCheckModeOn = false;
+            $document.off('mousemove', rangeCheckMouseMove);
+            $document.off('mouseup', rangeCheckMouseUp);
+
+          }
 
 
-          // end move
-          $model = undefined;
-          $document.off('mousemove', modelMouseMove);
-          $document.off('mouseup', modelMouseUp);
-
-        }
+        })();
 
       }
     };
