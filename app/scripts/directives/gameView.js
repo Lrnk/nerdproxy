@@ -150,8 +150,8 @@ angular.module('nerdproxyApp')
             //  return;
             //}
 
-            leftOffset = element[0].offsetLeft;
-            topOffset = element[0].offsetTop;
+            leftOffset = element[0].offsetLeft + gameScroll.x;
+            topOffset = element[0].offsetTop + gameScroll.y;
 
             startPageXPx = e.pageX - leftOffset;
             startPageYPx = e.pageY - topOffset;
