@@ -19,6 +19,12 @@ angular.module('nerdproxyApp')
         var stuff = scope.stuff;
         var gameSnap = Snap('.game-entities');
 
+        var rangeLineSnap = gameSnap.line(0, 0, 0, 0);
+        rangeLineSnap.addClass('range-line');
+
+        var rangeInfoSnap = gameSnap.text(0, 0, '');
+        rangeInfoSnap.addClass('range-info-text');
+
         element.find('svg')[0].setAttribute('viewBox', '0 0 ' + stuff.boardWidthCm + ' ' + stuff.boardHeightCm);
 
         var gameScroll = new IScroll(element[0], {
@@ -68,13 +74,17 @@ angular.module('nerdproxyApp')
         function refreshState() {
 
           $timeout(function () {
-            gameSnap.clear();
 
+            gameSnap.selectAll('circle').remove();
             angular.forEach(scope.state.models, function (model, modelId) {
               var thisCircle = gameSnap.circle(model.xCm, model.yCm, 1.25);
               thisCircle.addClass('model inf');
               thisCircle.attr('data-model-id', modelId);
             });
+
+            if (scope.state.range) {
+              drawRangeLine(scope.state.range);
+            }
 
           })
         }
@@ -140,20 +150,12 @@ angular.module('nerdproxyApp')
           var startPageYPx;
           var leftOffset;
           var topOffset;
-
-          var rangeLine;
-          var infoText;
+          var range;
 
           $document.on('mousedown', function rangeCheckMouseDown(e) {
 
             if (!stuff.rangeCheckModeOn) {
               return;
-            }
-
-            //remove the last one
-            if(rangeLine) {
-              rangeLine.remove();
-              infoText.remove();
             }
 
             leftOffset = element[0].offsetLeft + gameScroll.x;
@@ -162,14 +164,18 @@ angular.module('nerdproxyApp')
             startPageXPx = e.pageX - leftOffset;
             startPageYPx = e.pageY - topOffset;
 
-            rangeLine = gameSnap.line(scope.pxToCm(startPageXPx), scope.pxToCm(startPageYPx), scope.pxToCm(startPageXPx), scope.pxToCm(startPageYPx));
-            rangeLine.addClass('range-line');
-
-            infoText = gameSnap.text(scope.pxToCm(startPageXPx), scope.pxToCm(startPageYPx) + 6, '0.0');
-            infoText.addClass('range-info-text');
-
             $document.on('mousemove', rangeCheckMouseMove);
             $document.on('mouseup', rangeCheckMouseUp);
+
+            range = {
+              x1Cm: scope.pxToCm(startPageXPx),
+              y1Cm: scope.pxToCm(startPageYPx),
+              x2Cm: scope.pxToCm(startPageXPx),
+              y2Cm: scope.pxToCm(startPageYPx),
+              infoText: '0.0'
+            };
+
+            drawRangeLine(range);
 
           });
 
@@ -181,16 +187,11 @@ angular.module('nerdproxyApp')
             var lengthPx = Math.sqrt(posChangeXPx * posChangeXPx + posChangeYPx * posChangeYPx);
             var lengthInches = scope.pxToCm(lengthPx) * 0.393700787;
 
-            rangeLine.attr({
-              x2: scope.pxToCm(startPageXPx) - scope.pxToCm(posChangeXPx),
-              y2: scope.pxToCm(startPageYPx) - scope.pxToCm(posChangeYPx)
-            });
+            range.x2Cm = range.x1Cm - scope.pxToCm(posChangeXPx);
+            range.y2Cm = range.y1Cm - scope.pxToCm(posChangeYPx);
+            range.infoText = lengthInches.toFixed(1);
 
-            infoText.attr({
-              x: scope.pxToCm(startPageXPx) - scope.pxToCm(posChangeXPx),
-              y: (scope.pxToCm(startPageYPx) - scope.pxToCm(posChangeYPx)) + 6,
-              text: lengthInches.toFixed(1)
-            });
+            drawRangeLine(range);
           }
 
           function rangeCheckMouseUp() {
@@ -199,10 +200,29 @@ angular.module('nerdproxyApp')
             $document.off('mousemove', rangeCheckMouseMove);
             $document.off('mouseup', rangeCheckMouseUp);
 
+            scope.state.range = range;
+            scope.saveState();
+
           }
 
 
         })();
+
+        function drawRangeLine(range) {
+          rangeLineSnap.attr({
+            x1: range.x1Cm,
+            y1: range.y1Cm,
+            x2: range.x2Cm,
+            y2: range.y2Cm
+          });
+
+          rangeInfoSnap.attr({
+            x: range.x2Cm,
+            y: range.y2Cm + 6,
+            text: range.infoText
+          });
+
+        }
 
       }
     };
