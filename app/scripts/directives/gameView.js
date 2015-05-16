@@ -146,9 +146,15 @@ angular.module('nerdproxyApp')
 
           $document.on('mousedown', function rangeCheckMouseDown(e) {
 
-            //if (!scope.rangeCheckModeOn) {
-            //  return;
-            //}
+            if (!stuff.rangeCheckModeOn) {
+              return;
+            }
+
+            //remove the last one
+            if(rangeLine) {
+              rangeLine.remove();
+              infoText.remove();
+            }
 
             leftOffset = element[0].offsetLeft + gameScroll.x;
             topOffset = element[0].offsetTop + gameScroll.y;

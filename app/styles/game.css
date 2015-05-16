@@ -6,6 +6,15 @@
   right: 0;
 }
 
+.game * {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 .game-view-wrapper {
   position: relative;
   overflow: hidden;
@@ -50,12 +59,5 @@ svg.game-entities {
 .range-info-text {
   font-size: 5px;
   fill: white;
-
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
 }
 

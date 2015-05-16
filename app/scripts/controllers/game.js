@@ -22,6 +22,7 @@ angular.module('nerdproxyApp')
       //fields
 
       moveModeOn: false,
+      rangeCheckModeOn: false,
       zoomFactor: 1,
       boardWidth: 1000,
       boardHeight: 666
@@ -35,6 +36,7 @@ angular.module('nerdproxyApp')
       saveState: saveState,
 
       toggleMoveMode: toggleMoveMode,
+      toggleRangeCheckMode: toggleRangeCheckMode,
       zoomIn: zoomIn,
       zoomOut: zoomOut,
 
@@ -47,6 +49,10 @@ angular.module('nerdproxyApp')
 
     function toggleMoveMode() {
       stuff.moveModeOn = !stuff.moveModeOn;
+    }
+
+    function toggleRangeCheckMode() {
+      stuff.rangeCheckModeOn = !stuff.rangeCheckModeOn;
     }
 
     function zoomIn() {
