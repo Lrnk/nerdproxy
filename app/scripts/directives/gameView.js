@@ -18,6 +18,8 @@ angular.module('nerdproxyApp')
 
         var stuff = scope.stuff;
 
+        element.find('svg')[0].setAttribute('viewBox', '0 0 ' + stuff.boardWidthCm + ' ' + stuff.boardHeightCm);
+
         var gameScroll = new IScroll(element[0], {
           scrollbars: true,
           freeScroll: true,
@@ -65,15 +67,15 @@ angular.module('nerdproxyApp')
         function refreshState() {
 
           $timeout(function() {
-            var $entities = element.find('svg');
+            var s = Snap('.game-entities');
 
-            $entities.empty();
+            s.clear();
 
             angular.forEach(scope.state.models, function (model, modelId) {
-              $entities.append('<circle data-model-id="' + modelId + '" class="model inf" cx="' + model.xCm + '" cy="' + model.yCm + '" r="1.25"/>')
+              var thisCircle = s.circle(model.xCm, model.yCm, 1.25);
+              thisCircle.addClass('model inf');
+              thisCircle.attr('data-model-id', modelId);
             });
-
-            element.html(element.html()); // refresh the html so the svg is redrawn
 
           })
         }
