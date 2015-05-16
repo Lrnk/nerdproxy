@@ -47,3 +47,8 @@ svg.game-entities {
   vector-effect: non-scaling-stroke;
 }
 
+.range-info-text {
+  font-size: 5px;
+  fill: white;
+}
+

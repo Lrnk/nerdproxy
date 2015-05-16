@@ -138,9 +138,11 @@ angular.module('nerdproxyApp')
 
           var startPageXPx;
           var startPageYPx;
-          var rangeLine;
           var leftOffset;
           var topOffset;
+
+          var rangeLine;
+          var infoText;
 
           $document.on('mousedown', function rangeCheckMouseDown(e) {
 
@@ -157,6 +159,9 @@ angular.module('nerdproxyApp')
             rangeLine = gameSnap.line(scope.pxToCm(startPageXPx), scope.pxToCm(startPageYPx), scope.pxToCm(startPageXPx), scope.pxToCm(startPageYPx));
             rangeLine.addClass('range-line');
 
+            infoText = gameSnap.text(scope.pxToCm(startPageXPx), scope.pxToCm(startPageYPx) + 6, '0.0');
+            infoText.addClass('range-info-text');
+
             $document.on('mousemove', rangeCheckMouseMove);
             $document.on('mouseup', rangeCheckMouseUp);
 
@@ -167,9 +172,18 @@ angular.module('nerdproxyApp')
             var posChangeXPx = startPageXPx - (e.pageX - leftOffset);
             var posChangeYPx = startPageYPx - (e.pageY - topOffset);
 
+            var lengthPx = Math.sqrt(posChangeXPx * posChangeXPx + posChangeYPx * posChangeYPx);
+            var lengthInches = scope.pxToCm(lengthPx) * 0.393700787;
+
             rangeLine.attr({
               x2: scope.pxToCm(startPageXPx) - scope.pxToCm(posChangeXPx),
               y2: scope.pxToCm(startPageYPx) - scope.pxToCm(posChangeYPx)
+            });
+
+            infoText.attr({
+              x: scope.pxToCm(startPageXPx) - scope.pxToCm(posChangeXPx),
+              y: (scope.pxToCm(startPageYPx) - scope.pxToCm(posChangeYPx)) + 6,
+              text: lengthInches.toFixed(1)
             });
           }
 
