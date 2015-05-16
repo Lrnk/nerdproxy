@@ -60,6 +60,8 @@ angular.module('nerdproxyApp')
         });
 
 
+        scope.$on('refreshState', refreshState);
+
         function refreshState() {
 
           $timeout(function() {
@@ -67,7 +69,7 @@ angular.module('nerdproxyApp')
 
             $entities.empty();
 
-            angular.forEach(scope.testState.models, function (model) {
+            angular.forEach(scope.state.models, function (model) {
               $entities.append('<circle data-model-id="' + model.id + '" class="model inf" cx="' + model.xCm + '" cy="' + model.yCm + '" r="1.25"/>')
             });
 
@@ -75,9 +77,6 @@ angular.module('nerdproxyApp')
 
           })
         }
-
-        refreshState();
-
 
         // Moving models
 

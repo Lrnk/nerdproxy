@@ -8,7 +8,7 @@
  * Controller of the nerdproxyApp
  */
 angular.module('nerdproxyApp')
-  .controller('GameCtrl', function ($scope) {
+  .controller('GameCtrl', function ($scope, Ref) {
 
     var stuff = {
 
@@ -62,19 +62,11 @@ angular.module('nerdproxyApp')
     }
 
 
-    $scope.testState = {
-      models: [
-        {
-          id: 0,
-          xCm: 20,
-          yCm: 20
-        },
-        {
-          id: 1,
-          xCm: 30,
-          yCm: 30
-        }
-      ]
-    }
+    //data yo
+
+    Ref.on('value', function(snapshot) {
+      $scope.state = snapshot.val().game1;
+      $scope.$broadcast('refreshState');
+    });
 
   });
