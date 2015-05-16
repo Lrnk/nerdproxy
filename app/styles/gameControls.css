@@ -10,9 +10,19 @@
 
 .button {
   display: inline-block;
+  vertical-align: top;
   outline: 1px solid gold;
   margin: 5px;
   height: 40px;
   width: 40px;
   cursor: pointer;
+}
+
+.button.disabled {
+  outline: 1px solid lightgrey;
+  color: lightgrey;
+}
+
+.button.on {
+  outline: 1px solid red;
 }

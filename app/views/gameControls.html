@@ -2,7 +2,16 @@
 
   <div
     class="button"
+    ng-click="toggleMoveMode()"
+    ng-class="{'on': stuff.moveModeOn}"
+    >
+    Move mode toggle
+  </div>
+
+  <div
+    class="button"
     ng-click="zoomIn()"
+    ng-class="{'disabled': !stuff.moveModeOn}"
     >
     Zoom in
   </div>
@@ -10,6 +19,7 @@
   <div
     class="button"
     ng-click="zoomOut()"
+    ng-class="{'disabled': !stuff.moveModeOn}"
     >
     Zoom out
   </div>

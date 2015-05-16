@@ -7,7 +7,7 @@
  * # gameControls
  */
 angular.module('nerdproxyApp')
-  .directive('gameView', function ($timeout, $window) {
+  .directive('gameView', function ($document, $timeout, $window) {
     return {
       restrict: 'E',
       templateUrl: 'views/gameView.html',
@@ -49,6 +49,61 @@ angular.module('nerdproxyApp')
           stuff.boardWidth = Math.min(stuff.boardWidth, stuff.boardHeight / (1 / 1.5)); // 0.6 recurring
           stuff.boardHeight = Math.min(stuff.boardHeight, stuff.boardWidth * (1 / 1.5)); // 0.6 recurring
         }
+
+
+        scope.$watch('stuff.moveModeOn', function() {
+          if(scope.stuff.moveModeOn) {
+            gameScroll.enable();
+          } else {
+            gameScroll.disable();
+          }
+        });
+
+
+
+
+
+        // Moving models
+
+        var startPageXPx;
+        var startPageYPx;
+        var startModelXCm;
+        var startModelYCm;
+        var $model;
+
+        $document.on('mousedown', function(e) {
+
+          if(e.target.tagName !== 'circle') {
+            return;
+          }
+
+          startPageXPx = e.pageX;
+          startPageYPx = e.pageY;
+          $model = angular.element(e.target);
+          startModelXCm = $window.parseInt($model.attr('cx'));
+          startModelYCm = $window.parseInt($model.attr('cy'));
+
+
+          $document.on('mousemove', modelMouseMove);
+          $document.on('mouseup', modelMouseUp);
+
+        });
+
+        function modelMouseMove(e) {
+
+          var posChangeXPx = startPageXPx - e.pageX;
+          var posChangeYPx = startPageYPx - e.pageY;
+
+          $model.attr('cx', startModelXCm - scope.pxToCm(posChangeXPx));
+          $model.attr('cy', startModelYCm - scope.pxToCm(posChangeYPx));
+        }
+
+        function modelMouseUp() {
+          $model = undefined;
+          $document.off('mousemove', modelMouseMove);
+          $document.off('mouseup', modelMouseUp);
+        }
+
       }
     };
   });
