@@ -27,8 +27,8 @@ angular.module('nerdproxyApp')
           momentum: false
         });
 
-        scope.$watch('stuff.zoomFactor', function(newVal) {
-          if(newVal) {
+        scope.$watch('stuff.zoomFactor', function (newVal) {
+          if (newVal) {
             gameScroll.refresh();
           }
         });
@@ -51,8 +51,8 @@ angular.module('nerdproxyApp')
         }
 
 
-        scope.$watch('stuff.moveModeOn', function() {
-          if(scope.stuff.moveModeOn) {
+        scope.$watch('stuff.moveModeOn', function () {
+          if (scope.stuff.moveModeOn) {
             gameScroll.enable();
           } else {
             gameScroll.disable();
@@ -60,7 +60,23 @@ angular.module('nerdproxyApp')
         });
 
 
+        function refreshState() {
 
+          $timeout(function() {
+            var $entities = element.find('svg');
+
+            $entities.empty();
+
+            angular.forEach(scope.testState.models, function (model) {
+              $entities.append('<circle data-model-id="' + model.id + '" class="model inf" cx="' + model.xCm + '" cy="' + model.yCm + '" r="1.25"/>')
+            });
+
+            element.html(element.html()); // refresh the html so the svg is redrawn
+
+          })
+        }
+
+        refreshState();
 
 
         // Moving models
@@ -71,9 +87,9 @@ angular.module('nerdproxyApp')
         var startModelYCm;
         var $model;
 
-        $document.on('mousedown', function(e) {
+        $document.on('mousedown', function (e) {
 
-          if(e.target.tagName !== 'circle') {
+          if (e.target.tagName !== 'circle') {
             return;
           }
 

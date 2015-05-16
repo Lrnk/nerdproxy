@@ -61,4 +61,20 @@ angular.module('nerdproxyApp')
       }
     }
 
+
+    $scope.testState = {
+      models: [
+        {
+          id: 0,
+          xCm: 20,
+          yCm: 20
+        },
+        {
+          id: 1,
+          xCm: 30,
+          yCm: 30
+        }
+      ]
+    }
+
   });
