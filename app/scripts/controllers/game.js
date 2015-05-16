@@ -32,6 +32,8 @@ angular.module('nerdproxyApp')
 
       stuff: stuff,
 
+      saveState: saveState,
+
       toggleMoveMode: toggleMoveMode,
       zoomIn: zoomIn,
       zoomOut: zoomOut,
@@ -65,8 +67,12 @@ angular.module('nerdproxyApp')
     //data yo
 
     Ref.on('value', function(snapshot) {
-      $scope.state = snapshot.val().game1;
+      $scope.state = snapshot.val()['game1'];
       $scope.$broadcast('refreshState');
     });
+
+    function saveState() {
+      Ref.child('game1').set($scope.state);
+    }
 
   });

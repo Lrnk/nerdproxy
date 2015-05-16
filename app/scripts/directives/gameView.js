@@ -69,8 +69,8 @@ angular.module('nerdproxyApp')
 
             $entities.empty();
 
-            angular.forEach(scope.state.models, function (model) {
-              $entities.append('<circle data-model-id="' + model.id + '" class="model inf" cx="' + model.xCm + '" cy="' + model.yCm + '" r="1.25"/>')
+            angular.forEach(scope.state.models, function (model, modelId) {
+              $entities.append('<circle data-model-id="' + modelId + '" class="model inf" cx="' + model.xCm + '" cy="' + model.yCm + '" r="1.25"/>')
             });
 
             element.html(element.html()); // refresh the html so the svg is redrawn
@@ -85,6 +85,7 @@ angular.module('nerdproxyApp')
         var startModelXCm;
         var startModelYCm;
         var $model;
+        var modelId;
 
         $document.on('mousedown', function (e) {
 
@@ -95,6 +96,7 @@ angular.module('nerdproxyApp')
           startPageXPx = e.pageX;
           startPageYPx = e.pageY;
           $model = angular.element(e.target);
+          modelId = $model.data('modelId');
           startModelXCm = $window.parseInt($model.attr('cx'));
           startModelYCm = $window.parseInt($model.attr('cy'));
 
@@ -114,9 +116,18 @@ angular.module('nerdproxyApp')
         }
 
         function modelMouseUp() {
+
+          // update state
+          scope.state.models[modelId].xCm = $model.attr('cx');
+          scope.state.models[modelId].yCm = $model.attr('cy');
+          scope.saveState();
+
+
+          // end move
           $model = undefined;
           $document.off('mousemove', modelMouseMove);
           $document.off('mouseup', modelMouseUp);
+
         }
 
       }
