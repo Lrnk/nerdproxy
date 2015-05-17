@@ -286,12 +286,13 @@ angular.module('nerdproxyApp')
         }
 
         (function initModelSelectionStuff() {
-          
+
           var startXCm;
           var startYCm;
           var leftOffset;
           var topOffset;
           var selectBoxSnap;
+          var modelsWithin;
 
           $document.on('mousedown', function selectBoxMouseDown(e) {
 
@@ -314,9 +315,10 @@ angular.module('nerdproxyApp')
             startXCm = scope.pxToCm(pointerPosX - leftOffset);
             startYCm = scope.pxToCm(pointerPosY - topOffset);
 
-            // draw box
             selectBoxSnap = gameSnap.rect(startXCm, startYCm, 0, 0);
             selectBoxSnap.addClass('select-box');
+
+            modelsWithin = [];
 
             $document.on('mousemove', selectBoxMouseMove);
             $document.on('mouseup', selectBoxMouseUp);
@@ -331,13 +333,27 @@ angular.module('nerdproxyApp')
             var posChangeXCm = startXCm - scope.pxToCm(pointerPosX - leftOffset);
             var posChangeYCm = startYCm - scope.pxToCm(pointerPosY - topOffset);
 
+            var x = Math.min(startXCm, startXCm - posChangeXCm);
+            var y = Math.min(startYCm, startYCm - posChangeYCm);
+            var w = Math.abs(posChangeXCm);
+            var h = Math.abs(posChangeYCm);
+
             selectBoxSnap.attr({
-              'x': Math.min(startXCm, startXCm - posChangeXCm),
-              'y': Math.min(startYCm, startYCm - posChangeYCm),
-              'width': Math.abs(posChangeXCm),
-              'height': Math.abs(posChangeYCm)
+              'x': x,
+              'y': y,
+              'width': w,
+              'height': h
             });
 
+            modelsWithin = [];
+            angular.forEach(scope.state.models, function(model, modelId) {
+              if (model.xCm > x && model.xCm < (x + w) && model.yCm > y && model.yCm < (y + h)) {
+                modelsWithin.push(model);
+                gameSnap.select('.model-id-' + modelId).addClass('selected');
+              } else {
+                gameSnap.select('.model-id-' + modelId).removeClass('selected');
+              }
+            });
           }
 
           function selectBoxMouseUp() {
