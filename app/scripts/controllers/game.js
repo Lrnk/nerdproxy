@@ -11,7 +11,8 @@ angular.module('nerdproxyApp')
   .constant('Mode', {
     DEFAULT: 0,
     MOVE_VIEW: 1,
-    RANGE: 2
+    RANGE: 2,
+    MOVE_SELECTION: 3
   })
   .controller('GameCtrl', function ($scope, Ref, Mode) {
 
@@ -46,6 +47,7 @@ angular.module('nerdproxyApp')
 
       toggleMoveMode: toggleMoveMode,
       toggleRangeCheckMode: toggleRangeCheckMode,
+      toggleMoveSelectionMode: toggleMoveSelectionMode,
       zoomIn: zoomIn,
       zoomOut: zoomOut,
 
@@ -63,6 +65,14 @@ angular.module('nerdproxyApp')
         stuff.mode = Mode.DEFAULT;
       } else {
         stuff.mode = Mode.MOVE_VIEW;
+      }
+    }
+
+    function toggleMoveSelectionMode() {
+      if(stuff.mode === Mode.MOVE_SELECTION) {
+        stuff.mode = Mode.DEFAULT;
+      } else {
+        stuff.mode = Mode.MOVE_SELECTION;
       }
     }
 

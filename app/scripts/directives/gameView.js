@@ -137,11 +137,14 @@ angular.module('nerdproxyApp')
 
           function modelMouseDown(e) {
 
-            if (stuff.mode !== Mode.DEFAULT) {
-              return;
-            }
-
-            if (e.target.tagName !== 'circle') {
+            // if we're in default mode, only move if we're clicking on a model
+            // if we're in move_select mode, accept the selection as is and move it
+            // else do nothing
+            if (stuff.mode === Mode.DEFAULT && e.target.tagName === 'circle') {
+              if (!stuff.selectedModelIds || stuff.selectedModelIds.length <= 1) {
+                stuff.selectedModelIds = [$(e.target).data('modelId')];
+              }
+            } else if (stuff.mode !== Mode.MOVE_SELECTION) {
               return;
             }
 
@@ -153,10 +156,6 @@ angular.module('nerdproxyApp')
 
             startPageXPx = pointerPosX - leftOffset;
             startPageYPx = pointerPosY - topOffset;
-
-            if (!stuff.selectedModelIds || stuff.selectedModelIds.length <= 1) {
-              stuff.selectedModelIds = [$(e.target).data('modelId')];
-            }
 
             angular.forEach(gameSnap.selectAll('.model'), function (anyModelSnap) {
               anyModelSnap.removeClass('selected');
@@ -196,10 +195,10 @@ angular.module('nerdproxyApp')
           function modelMouseMove(e) {
 
             var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - (stuff.mode !== Mode.MOVE_SELECTION ? spaceForThumb : 0) : e.pageY;
 
             var posChangeXPx = startPageXPx - (pointerPosX - leftOffset);
-            var posChangeYPx = (startPageYPx - (pointerPosY - topOffset)) + spaceForThumb;
+            var posChangeYPx = startPageYPx - (pointerPosY - topOffset);
 
             angular.forEach(movingModels, function (movingModel) {
               movingModel.modelCloneSnap.attr('cx', movingModel.startModelXCm - scope.pxToCm(posChangeXPx));
@@ -235,6 +234,8 @@ angular.module('nerdproxyApp')
             $document.off('touchcancel', modelMouseUp);
 
             scope.saveState();
+
+            scope.$apply();
           }
 
         })();
@@ -319,6 +320,7 @@ angular.module('nerdproxyApp')
             scope.state.range = range;
             scope.saveState();
 
+            scope.$apply();
           }
 
 
@@ -432,6 +434,8 @@ angular.module('nerdproxyApp')
             $document.off('touchmove', selectBoxMouseMove);
             $document.off('touchend', selectBoxMouseUp);
             $document.off('touchcancel', selectBoxMouseUp);
+
+            scope.$apply();
           }
 
         })();
