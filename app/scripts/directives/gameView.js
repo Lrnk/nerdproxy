@@ -100,7 +100,7 @@ angular.module('nerdproxyApp')
         scope.$on('refreshState', refreshState);
 
         function refreshState() {
-
+          
           $timeout(function () {
 
             gameSnap.selectAll('circle').remove();
@@ -108,13 +108,17 @@ angular.module('nerdproxyApp')
               var thisCircle = gameSnap.circle(model.xCm, model.yCm, 1.25);
               thisCircle.addClass('model inf model-id-' + modelId);
               thisCircle.attr('data-model-id', modelId);
-            });
 
-            if (scope.state.range) {
-              drawRangeLine(scope.state.range);
-            }
+              if (_.contains(stuff.selectedModelIds, modelId)){
+                thisCircle.addClass('selected');
+              }
 
-          })
+              if (scope.state.range) {
+                drawRangeLine(scope.state.range);
+              }
+
+            })
+          });
         }
 
 
@@ -122,11 +126,8 @@ angular.module('nerdproxyApp')
 
           var startPageXPx;
           var startPageYPx;
-          var startModelXCm;
-          var startModelYCm;
-          var $model;
-          var modelCloneSnap;
-          var modelId;
+
+          var movingModels;
 
           $document.on('mousedown', function modelMouseDown(e) {
 
@@ -140,15 +141,35 @@ angular.module('nerdproxyApp')
 
             startPageXPx = e.pageX;
             startPageYPx = e.pageY;
-            $model = $(e.target);
-            modelId = $model.data('modelId');
-            modelCloneSnap = gameSnap.select('.model-id-' + modelId).clone();
-            modelCloneSnap.addClass('move-shadow');
-            modelCloneSnap.attr({
-              'data-model-id': ''
+
+            if (!stuff.selectedModelIds || stuff.selectedModelIds.length <= 1) {
+              stuff.selectedModelIds = [$(e.target).data('modelId')];
+            }
+
+            angular.forEach(gameSnap.selectAll('.model'), function (anyModelSnap) {
+              anyModelSnap.removeClass('selected');
             });
-            startModelXCm = $window.parseInt($model.attr('cx'));
-            startModelYCm = $window.parseInt($model.attr('cy'));
+            movingModels = _.map(stuff.selectedModelIds, function (modelId) {
+
+              var $model = element.find('.model-id-' + modelId);
+
+              var modelSnap = gameSnap.select('.model-id-' + modelId);
+              modelSnap.addClass('selected');
+              var modelCloneSnap = modelSnap.clone();
+              modelCloneSnap.addClass('move-shadow');
+              modelCloneSnap.attr({
+                'data-model-id': ''
+              });
+
+              return {
+                modelId: modelId,
+                model: scope.state.models[modelId],
+                $model: $model,
+                modelCloneSnap: modelCloneSnap,
+                startModelXCm: $window.parseInt($model.attr('cx')),
+                startModelYCm: $window.parseInt($model.attr('cy'))
+              }
+            });
 
 
             $document.on('mousemove', modelMouseMove);
@@ -161,25 +182,36 @@ angular.module('nerdproxyApp')
             var posChangeXPx = startPageXPx - e.pageX;
             var posChangeYPx = startPageYPx - e.pageY;
 
-            modelCloneSnap.attr('cx', startModelXCm - scope.pxToCm(posChangeXPx));
-            modelCloneSnap.attr('cy', startModelYCm - scope.pxToCm(posChangeYPx));
+            angular.forEach(movingModels, function (movingModel) {
+              movingModel.modelCloneSnap.attr('cx', movingModel.startModelXCm - scope.pxToCm(posChangeXPx));
+              movingModel.modelCloneSnap.attr('cy', movingModel.startModelYCm - scope.pxToCm(posChangeYPx));
+            });
+
+
           }
 
           function modelMouseUp() {
 
-            // update state
-            scope.state.models[modelId].xCm = modelCloneSnap.attr('cx');
-            scope.state.models[modelId].yCm = modelCloneSnap.attr('cy');
-            scope.saveState();
+            angular.forEach(movingModels, function (movingModel) {
 
-            $model.attr('cx', modelCloneSnap.cx);
-            $model.attr('cy', modelCloneSnap.cy);
+              movingModel.model.xCm = movingModel.modelCloneSnap.attr('cx');
+              movingModel.model.yCm = movingModel.modelCloneSnap.attr('cy');
 
-            $model = undefined;
-            modelCloneSnap.remove();
+              movingModel.$model.attr('cx', movingModel.modelCloneSnap.cx);
+              movingModel.$model.attr('cy', movingModel.modelCloneSnap.cy);
+
+              movingModel.modelCloneSnap.remove();
+            });
+
+            stuff.selectedModelIds = _.map(movingModels, function (movingModel) {
+              return movingModel.modelId;
+            });
+
+            movingModels = [];
             $document.off('mousemove', modelMouseMove);
             $document.off('mouseup', modelMouseUp);
 
+            scope.saveState();
           }
 
         })();
@@ -346,7 +378,7 @@ angular.module('nerdproxyApp')
             });
 
             modelsWithin = [];
-            angular.forEach(scope.state.models, function(model, modelId) {
+            angular.forEach(scope.state.models, function (model, modelId) {
               if (model.xCm > x && model.xCm < (x + w) && model.yCm > y && model.yCm < (y + h)) {
                 modelsWithin.push(model);
                 gameSnap.select('.model-id-' + modelId).addClass('selected');
@@ -359,6 +391,10 @@ angular.module('nerdproxyApp')
           function selectBoxMouseUp() {
 
             selectBoxSnap.remove();
+
+            stuff.selectedModelIds = _.map(modelsWithin, function (model) {
+              return model.id;
+            });
 
             $document.off('mousemove', selectBoxMouseMove);
             $document.off('mouseup', selectBoxMouseUp);
