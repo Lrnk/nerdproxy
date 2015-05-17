@@ -100,7 +100,7 @@ angular.module('nerdproxyApp')
         scope.$on('refreshState', refreshState);
 
         function refreshState() {
-          
+
           $timeout(function () {
 
             gameSnap.selectAll('circle').remove();
@@ -326,7 +326,10 @@ angular.module('nerdproxyApp')
           var selectBoxSnap;
           var modelsWithin;
 
-          $document.on('mousedown', function selectBoxMouseDown(e) {
+          $document.on('mousedown', selectBoxMouseDown);
+          $document.on('touchstart', selectBoxMouseDown);
+
+          function selectBoxMouseDown(e) {
 
             if (stuff.mode !== Mode.DEFAULT) {
               return;
@@ -342,7 +345,7 @@ angular.module('nerdproxyApp')
             topOffset = element[0].offsetTop + gameScroll.y;
 
             var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb : e.pageY;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
 
             startXCm = scope.pxToCm(pointerPosX - leftOffset);
             startYCm = scope.pxToCm(pointerPosY - topOffset);
@@ -355,12 +358,16 @@ angular.module('nerdproxyApp')
             $document.on('mousemove', selectBoxMouseMove);
             $document.on('mouseup', selectBoxMouseUp);
 
-          });
+            $document.on('touchmove', selectBoxMouseMove);
+            $document.on('touchend', selectBoxMouseUp);
+            $document.on('touchcancel', selectBoxMouseUp);
+
+          }
 
           function selectBoxMouseMove(e) {
 
             var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb : e.pageY;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
 
             var posChangeXCm = startXCm - scope.pxToCm(pointerPosX - leftOffset);
             var posChangeYCm = startYCm - scope.pxToCm(pointerPosY - topOffset);
@@ -399,6 +406,9 @@ angular.module('nerdproxyApp')
             $document.off('mousemove', selectBoxMouseMove);
             $document.off('mouseup', selectBoxMouseUp);
 
+            $document.off('touchmove', selectBoxMouseMove);
+            $document.off('touchend', selectBoxMouseUp);
+            $document.off('touchcancel', selectBoxMouseUp);
           }
 
         })();
