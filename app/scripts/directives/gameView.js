@@ -150,9 +150,12 @@ angular.module('nerdproxyApp')
             // if we're in move_select mode, accept the selection as is and move it
             // else do nothing
             if (stuff.mode === Mode.DEFAULT && e.target.tagName === 'circle') {
-              if (!stuff.selectedModelIds || stuff.selectedModelIds.length <= 1) {
+
+              var targetIsAlreadySelected = stuff.selectedModelIds && _.contains(stuff.selectedModelIds, $(e.target).data('modelId'));
+              if (!targetIsAlreadySelected) {
                 stuff.selectedModelIds = [$(e.target).data('modelId')];
               }
+
             } else if (stuff.mode !== Mode.MOVE_SELECTION) {
               return;
             }
