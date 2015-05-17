@@ -213,8 +213,20 @@ angular.module('nerdproxyApp')
             var posChangeYPx = startPageYPx - (pointerPosY - topOffset);
 
             angular.forEach(movingModels, function (movingModel) {
-              movingModel.modelCloneSnap.attr('cx', movingModel.startModelXCm - scope.pxToCm(posChangeXPx));
-              movingModel.modelCloneSnap.attr('cy', movingModel.startModelYCm - scope.pxToCm(posChangeYPx));
+
+              var newXCm = movingModel.startModelXCm - scope.pxToCm(posChangeXPx);
+              var newYCm = movingModel.startModelYCm - scope.pxToCm(posChangeYPx);
+
+              var maxEdgeDist = movingModel.modelCloneSnap.attr('r') / 2;
+
+              newXCm = Math.max(newXCm, maxEdgeDist);
+              newXCm = Math.min(newXCm, stuff.boardWidthCm - maxEdgeDist);
+
+              newYCm = Math.max(newYCm, maxEdgeDist);
+              newYCm = Math.min(newYCm, stuff.boardHeightCm - maxEdgeDist);
+
+              movingModel.modelCloneSnap.attr('cx', newXCm);
+              movingModel.modelCloneSnap.attr('cy', newYCm);
             });
 
 
