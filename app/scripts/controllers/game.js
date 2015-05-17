@@ -40,7 +40,11 @@ angular.module('nerdproxyApp')
       zoomFactor: 1,
       boardWidth: 1000,
       boardHeight: 666,
-      mode: Mode.DEFAULT
+      mode: Mode.DEFAULT,
+
+      currentMessage: '',
+      numDice: 1,
+      diceValue: 6
 
     };
 
@@ -61,15 +65,47 @@ angular.module('nerdproxyApp')
 
       pxToCm: pxToCm,
 
-      Mode: Mode
+      Mode: Mode,
+
+      sendCurrentMessage: sendCurrentMessage,
+      rollDice: rollDice
     });
+
+    function rollDice() {
+
+      var results = [];
+      for (var i = 0; i < stuff.numDice; i++) {
+        results.push(Math.floor((Math.random() * stuff.diceValue) + 1));
+      }
+
+      if(!$scope.state.chatter) {
+        $scope.state.chatter = [];
+      }
+      $scope.state.chatter.push({
+        type: 'roll',
+        numDice: stuff.numDice,
+        diceValue: stuff.diceValue,
+        results: results
+      });
+      saveState();
+    }
+
+    function sendCurrentMessage() {
+      if(stuff.currentMessage.trim().length) {
+        $scope.state.chatter.push({
+          body: stuff.currentMessage
+        });
+        stuff.currentMessage = '';
+        saveState();
+      }
+    }
 
     function getXSpaceForMenus() {
       return 0;
     }
 
     function getYSpaceForMenus() {
-      return stuff.selectedModelIds && stuff.selectedModelIds.length ? 100 : 50;
+      return stuff.selectedModelIds && stuff.selectedModelIds.length ? 250 : 200;
     }
 
     function pxToCm(px) {
@@ -123,7 +159,7 @@ angular.module('nerdproxyApp')
     });
 
     function saveState() {
-      Ref.child('game1').set($scope.state);
+      Ref.child('game1').set(angular.fromJson(angular.toJson($scope.state)));
     }
 
   });

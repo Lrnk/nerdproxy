@@ -1,0 +1,34 @@
+<div class="chat-box">
+
+  <div class="chatter">
+
+    <ul ng-show="state.chatter.length">
+      <li class="chat-item" ng-repeat="chatItem in state.chatter | reverse">
+
+        <span ng-if="!chatItem.type">{{chatItem.body}}</span>
+
+        <span ng-if="chatItem.type === 'roll'">Rolled {{chatItem.numDice}} D{{chatItem.diceValue}}:
+          <span class="dice-results">
+            <span ng-repeat="result in chatItem.results track by $index">&nbsp;{{result}}</span>
+          </span>
+        </span>
+
+      </li>
+    </ul>
+
+  </div>
+
+  <form ng-submit="sendCurrentMessage()">
+    <input type="text" ng-model="stuff.currentMessage"/>
+    <input type="submit" value="send" />
+  </form>
+
+  <form ng-submit="rollDice()">
+    <span>Dice: </span>
+    <input class="num-dice" type="number" ng-model="stuff.numDice"/>
+    <span>x D</span>
+    <input class="dice-value" type="number" ng-model="stuff.diceValue"/>
+    <input type="submit" value="roll" />
+  </form>
+
+</div>
