@@ -126,10 +126,16 @@ angular.module('nerdproxyApp')
 
           var startPageXPx;
           var startPageYPx;
+          var leftOffset;
+          var topOffset;
+          var spaceForThumb = 50;
 
           var movingModels;
 
-          $document.on('mousedown', function modelMouseDown(e) {
+          $document.on('mousedown', modelMouseDown);
+          $document.on('touchstart', modelMouseDown);
+
+          function modelMouseDown(e) {
 
             if (stuff.mode !== Mode.DEFAULT) {
               return;
@@ -139,8 +145,14 @@ angular.module('nerdproxyApp')
               return;
             }
 
-            startPageXPx = e.pageX;
-            startPageYPx = e.pageY;
+            leftOffset = element[0].offsetLeft + gameScroll.x;
+            topOffset = element[0].offsetTop + gameScroll.y;
+
+            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
+
+            startPageXPx = pointerPosX - leftOffset;
+            startPageYPx = pointerPosY - topOffset;
 
             if (!stuff.selectedModelIds || stuff.selectedModelIds.length <= 1) {
               stuff.selectedModelIds = [$(e.target).data('modelId')];
@@ -175,12 +187,19 @@ angular.module('nerdproxyApp')
             $document.on('mousemove', modelMouseMove);
             $document.on('mouseup', modelMouseUp);
 
-          });
+            $document.on('touchmove', modelMouseMove);
+            $document.on('touchend', modelMouseUp);
+            $document.on('touchcancel', modelMouseUp);
+
+          }
 
           function modelMouseMove(e) {
 
-            var posChangeXPx = startPageXPx - e.pageX;
-            var posChangeYPx = startPageYPx - e.pageY;
+            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
+
+            var posChangeXPx = startPageXPx - (pointerPosX - leftOffset);
+            var posChangeYPx = (startPageYPx - (pointerPosY - topOffset)) + spaceForThumb;
 
             angular.forEach(movingModels, function (movingModel) {
               movingModel.modelCloneSnap.attr('cx', movingModel.startModelXCm - scope.pxToCm(posChangeXPx));
@@ -210,6 +229,10 @@ angular.module('nerdproxyApp')
             movingModels = [];
             $document.off('mousemove', modelMouseMove);
             $document.off('mouseup', modelMouseUp);
+
+            $document.off('touchmove', modelMouseMove);
+            $document.off('touchend', modelMouseUp);
+            $document.off('touchcancel', modelMouseUp);
 
             scope.saveState();
           }
