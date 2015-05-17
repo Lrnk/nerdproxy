@@ -36,6 +36,34 @@ angular.module('nerdproxyApp')
           momentum: false
         });
 
+        var hammertime = new Hammer(element[0]);
+        hammertime.get('pinch').set({enable: true});
+
+        var initialZoom;
+        hammertime.on('pinchstart', function() {
+
+          if(!stuff.moveModeOn){
+            return;
+          }
+
+          initialZoom = stuff.zoomFactor;
+          hammertime.on('pinchmove', pinchMoveZoom);
+
+          hammertime.on('pinchend', removePinchMoveZoom);
+          hammertime.on('pinchcancel', removePinchMoveZoom);
+
+          function removePinchMoveZoom() {
+            hammertime.off('pinchmove', pinchMoveZoom);
+          }
+
+        });
+
+        function pinchMoveZoom (e) {
+          scope.$apply(function () {
+            stuff.zoomFactor = Math.max(initialZoom + (e.scale - 1), 1);
+          })
+        }
+
         scope.$watch('stuff.zoomFactor', function (newVal) {
           if (newVal) {
             gameScroll.refresh();

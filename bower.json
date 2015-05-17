@@ -11,7 +11,8 @@
     "angular-sanitize": "^1.3.0",
     "angular-touch": "^1.3.0",
     "iscroll": "~5.1.3",
-    "snap.svg": "~0.4.1"
+    "snap.svg": "~0.4.1",
+    "hammerjs": "~2.0.4"
   },
   "devDependencies": {
     "mockfirebase": "0.11.0",
