@@ -78,13 +78,22 @@ angular.module('nerdproxyApp')
           });
         });
 
+        // this affects context menu being open
+        scope.$watch('stuff.selectedModelIds.length', function() {
+          $timeout(function () {
+            refreshWindowSize();
+          });
+        });
+
         function refreshWindowSize() {
 
-          stuff.boardWidth = Math.min(stuff.maxBoardWidth, $window.innerWidth);
-          stuff.boardHeight = Math.min(stuff.maxBoardHeight, $window.innerHeight);
+          stuff.boardWidth = Math.min(stuff.maxBoardWidth - scope.getXSpaceForMenus(), $window.innerWidth);
+          stuff.boardHeight = Math.min(stuff.maxBoardHeight - scope.getYSpaceForMenus(), $window.innerHeight);
 
-          stuff.boardWidth = Math.min(stuff.boardWidth, stuff.boardHeight / (1 / 1.5)); // 0.6 recurring
-          stuff.boardHeight = Math.min(stuff.boardHeight, stuff.boardWidth * (1 / 1.5)); // 0.6 recurring
+          var point6Recurring = (1 / 1.5);
+
+          stuff.boardWidth = Math.min(stuff.boardWidth, ((stuff.boardHeight - scope.getYSpaceForMenus()) / point6Recurring));
+          stuff.boardHeight = Math.min(stuff.boardHeight, ((stuff.boardWidth - scope.getXSpaceForMenus()) * point6Recurring));
         }
 
 

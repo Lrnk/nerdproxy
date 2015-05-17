@@ -26,8 +26,13 @@ angular.module('nerdproxyApp')
       boardHeightCm: 121.92,
 
       onMobile: (function onMobile() {
-        try{ document.createEvent("TouchEvent"); return true; }
-        catch(e){ return false; }
+        try {
+          document.createEvent("TouchEvent");
+          return true;
+        }
+        catch (e) {
+          return false;
+        }
       })(),
 
       //fields
@@ -51,17 +56,28 @@ angular.module('nerdproxyApp')
       zoomIn: zoomIn,
       zoomOut: zoomOut,
 
+      getXSpaceForMenus: getXSpaceForMenus,
+      getYSpaceForMenus: getYSpaceForMenus,
+
       pxToCm: pxToCm,
 
       Mode: Mode
     });
 
-    function pxToCm(px){
+    function getXSpaceForMenus() {
+      return 0;
+    }
+
+    function getYSpaceForMenus() {
+      return stuff.selectedModelIds && stuff.selectedModelIds.length ? 100 : 50;
+    }
+
+    function pxToCm(px) {
       return px * ((stuff.boardWidthCm / stuff.boardWidth) / stuff.zoomFactor);
     }
 
     function toggleMoveMode() {
-      if(stuff.mode === Mode.MOVE_VIEW) {
+      if (stuff.mode === Mode.MOVE_VIEW) {
         stuff.mode = Mode.DEFAULT;
       } else {
         stuff.mode = Mode.MOVE_VIEW;
@@ -69,7 +85,7 @@ angular.module('nerdproxyApp')
     }
 
     function toggleMoveSelectionMode() {
-      if(stuff.mode === Mode.MOVE_SELECTION) {
+      if (stuff.mode === Mode.MOVE_SELECTION) {
         stuff.mode = Mode.DEFAULT;
       } else {
         stuff.mode = Mode.MOVE_SELECTION;
@@ -77,7 +93,7 @@ angular.module('nerdproxyApp')
     }
 
     function toggleRangeCheckMode() {
-      if(stuff.mode === Mode.RANGE) {
+      if (stuff.mode === Mode.RANGE) {
         stuff.mode = Mode.DEFAULT;
       } else {
         stuff.mode = Mode.RANGE;
@@ -86,13 +102,13 @@ angular.module('nerdproxyApp')
 
     function zoomIn() {
 
-      if(stuff.mode === Mode.MOVE_VIEW) {
+      if (stuff.mode === Mode.MOVE_VIEW) {
         stuff.zoomFactor *= 1.5;
       }
     }
 
     function zoomOut() {
-      if(stuff.mode === Mode.MOVE_VIEW) {
+      if (stuff.mode === Mode.MOVE_VIEW) {
         stuff.zoomFactor /= 1.5;
         stuff.zoomFactor = Math.max(stuff.zoomFactor, 1);
       }
@@ -101,7 +117,7 @@ angular.module('nerdproxyApp')
 
     //data yo
 
-    Ref.on('value', function(snapshot) {
+    Ref.on('value', function (snapshot) {
       $scope.state = snapshot.val()['game1'];
       $scope.$broadcast('refreshState');
     });
