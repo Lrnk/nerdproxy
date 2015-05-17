@@ -106,7 +106,7 @@ angular.module('nerdproxyApp')
             gameSnap.selectAll('circle').remove();
             angular.forEach(scope.state.models, function (model, modelId) {
               var thisCircle = gameSnap.circle(model.xCm, model.yCm, 1.25);
-              thisCircle.addClass('model inf');
+              thisCircle.addClass('model inf model-id-' + modelId);
               thisCircle.attr('data-model-id', modelId);
             });
 
@@ -125,6 +125,7 @@ angular.module('nerdproxyApp')
           var startModelXCm;
           var startModelYCm;
           var $model;
+          var modelCloneSnap;
           var modelId;
 
           $document.on('mousedown', function modelMouseDown(e) {
@@ -135,8 +136,13 @@ angular.module('nerdproxyApp')
 
             startPageXPx = e.pageX;
             startPageYPx = e.pageY;
-            $model = angular.element(e.target);
+            $model = $(e.target);
             modelId = $model.data('modelId');
+            modelCloneSnap = gameSnap.select('.model-id-' + modelId).clone();
+            modelCloneSnap.addClass('move-shadow');
+            modelCloneSnap.attr({
+              'data-model-id': ''
+            });
             startModelXCm = $window.parseInt($model.attr('cx'));
             startModelYCm = $window.parseInt($model.attr('cy'));
 
@@ -151,20 +157,22 @@ angular.module('nerdproxyApp')
             var posChangeXPx = startPageXPx - e.pageX;
             var posChangeYPx = startPageYPx - e.pageY;
 
-            $model.attr('cx', startModelXCm - scope.pxToCm(posChangeXPx));
-            $model.attr('cy', startModelYCm - scope.pxToCm(posChangeYPx));
+            modelCloneSnap.attr('cx', startModelXCm - scope.pxToCm(posChangeXPx));
+            modelCloneSnap.attr('cy', startModelYCm - scope.pxToCm(posChangeYPx));
           }
 
           function modelMouseUp() {
 
             // update state
-            scope.state.models[modelId].xCm = $model.attr('cx');
-            scope.state.models[modelId].yCm = $model.attr('cy');
+            scope.state.models[modelId].xCm = modelCloneSnap.attr('cx');
+            scope.state.models[modelId].yCm = modelCloneSnap.attr('cy');
             scope.saveState();
 
+            $model.attr('cx', modelCloneSnap.cx);
+            $model.attr('cy', modelCloneSnap.cy);
 
-            // end move
             $model = undefined;
+            modelCloneSnap.remove();
             $document.off('mousemove', modelMouseMove);
             $document.off('mouseup', modelMouseUp);
 

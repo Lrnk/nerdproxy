@@ -49,6 +49,11 @@ svg.game-entities {
   vector-effect: non-scaling-stroke;
 }
 
+.model.move-shadow {
+  fill-opacity: 0.3;
+  stroke-opacity: 0.3;
+}
+
 
 .range-line {
   stroke: red;
