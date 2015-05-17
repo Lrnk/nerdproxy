@@ -24,6 +24,11 @@ angular.module('nerdproxyApp')
       boardWidthCm: 182.88,
       boardHeightCm: 121.92,
 
+      onMobile: (function onMobile() {
+        try{ document.createEvent("TouchEvent"); return true; }
+        catch(e){ return false; }
+      })(),
+
       //fields
 
       zoomFactor: 1,

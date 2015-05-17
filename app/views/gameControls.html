@@ -9,6 +9,7 @@
   </div>
 
   <div
+    ng-if="!stuff.onMobile"
     class="button"
     ng-click="zoomIn()"
     ng-class="{'disabled': stuff.mode !== Mode.MOVE_VIEW}"
@@ -17,6 +18,7 @@
   </div>
 
   <div
+    ng-if="!stuff.onMobile"
     class="button"
     ng-click="zoomOut()"
     ng-class="{'disabled': stuff.mode !== Mode.MOVE_VIEW}"
