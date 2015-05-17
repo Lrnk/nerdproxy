@@ -40,9 +40,9 @@ angular.module('nerdproxyApp')
         hammertime.get('pinch').set({enable: true});
 
         var initialZoom;
-        hammertime.on('pinchstart', function() {
+        hammertime.on('pinchstart', function () {
 
-          if(!stuff.moveModeOn){
+          if (!stuff.moveModeOn) {
             return;
           }
 
@@ -58,7 +58,7 @@ angular.module('nerdproxyApp')
 
         });
 
-        function pinchMoveZoom (e) {
+        function pinchMoveZoom(e) {
           scope.$apply(function () {
             stuff.zoomFactor = Math.max(initialZoom + (e.scale - 1), 1);
           })
@@ -179,21 +179,35 @@ angular.module('nerdproxyApp')
           var leftOffset;
           var topOffset;
           var range;
+          var spaceForThumb = 50;
 
-          $document.on('mousedown', function rangeCheckMouseDown(e) {
+          $document.on('mousedown', rangeCheckMouseDown);
+          $document.on('touchstart', rangeCheckMouseDown);
+
+          function rangeCheckMouseDown(e) {
 
             if (!stuff.rangeCheckModeOn) {
+              return;
+            }
+            if (!element.has($(e.target)).length) {
               return;
             }
 
             leftOffset = element[0].offsetLeft + gameScroll.x;
             topOffset = element[0].offsetTop + gameScroll.y;
 
-            startPageXPx = e.pageX - leftOffset;
-            startPageYPx = e.pageY - topOffset;
+            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb: e.pageY;
+
+            startPageXPx = pointerPosX - leftOffset;
+            startPageYPx = pointerPosY - topOffset;
 
             $document.on('mousemove', rangeCheckMouseMove);
             $document.on('mouseup', rangeCheckMouseUp);
+
+            $document.on('touchmove', rangeCheckMouseMove);
+            $document.on('touchend', rangeCheckMouseUp);
+            $document.on('touchcancel', rangeCheckMouseUp);
 
             range = {
               x1Cm: scope.pxToCm(startPageXPx),
@@ -205,12 +219,16 @@ angular.module('nerdproxyApp')
 
             drawRangeLine(range);
 
-          });
+          }
 
           function rangeCheckMouseMove(e) {
 
-            var posChangeXPx = startPageXPx - (e.pageX - leftOffset);
-            var posChangeYPx = startPageYPx - (e.pageY - topOffset);
+            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb: e.pageY;
+
+            var posChangeXPx = startPageXPx - (pointerPosX - leftOffset);
+            var posChangeYPx = startPageYPx - (pointerPosY - topOffset);
+
 
             var lengthPx = Math.sqrt(posChangeXPx * posChangeXPx + posChangeYPx * posChangeYPx);
             var lengthInches = scope.pxToCm(lengthPx) * 0.393700787;
@@ -227,6 +245,10 @@ angular.module('nerdproxyApp')
             scope.rangeCheckModeOn = false;
             $document.off('mousemove', rangeCheckMouseMove);
             $document.off('mouseup', rangeCheckMouseUp);
+
+            $document.off('touchmove', rangeCheckMouseMove);
+            $document.off('touchend', rangeCheckMouseUp);
+            $document.off('touchcancel', rangeCheckMouseUp);
 
             scope.state.range = range;
             scope.saveState();
@@ -246,7 +268,7 @@ angular.module('nerdproxyApp')
 
           rangeInfoSnap.attr({
             x: range.x2Cm,
-            y: range.y2Cm + 6,
+            y: range.y2Cm - 6,
             text: range.infoText
           });
 
