@@ -5,9 +5,9 @@
     <ul ng-show="state.chatter.length">
       <li class="chat-item" ng-repeat="chatItem in state.chatter | reverse">
 
-        <span ng-if="!chatItem.type">{{chatItem.body}}</span>
+        <span ng-if="!chatItem.type"><span class="chat-date">{{chatItem.date | chatDate}}</span> {{chatItem.body}}</span>
 
-        <span ng-if="chatItem.type === 'roll'">Rolled {{chatItem.numDice}} D{{chatItem.diceValue}}:
+        <span ng-if="chatItem.type === 'roll'"><span class="chat-date">{{chatItem.date | chatDate}}</span> Rolled {{chatItem.numDice}} D{{chatItem.diceValue}}:
           <span class="dice-results">
             <span ng-repeat="result in chatItem.results track by $index">&nbsp;{{result}}</span>
           </span>

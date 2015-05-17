@@ -14,6 +14,11 @@ angular.module('nerdproxyApp')
     RANGE: 2,
     MOVE_SELECTION: 3
   })
+  .filter('chatDate', function () {
+    return function (date) {
+      return new moment(date).calendar();
+    };
+  })
   .controller('GameCtrl', function ($scope, Ref, Mode) {
 
     var stuff = {
@@ -73,27 +78,33 @@ angular.module('nerdproxyApp')
 
     function rollDice() {
 
+      if(stuff.numDice === null || stuff.diceValue === null) {
+        return;
+      }
+
       var results = [];
       for (var i = 0; i < stuff.numDice; i++) {
         results.push(Math.floor((Math.random() * stuff.diceValue) + 1));
       }
 
-      if(!$scope.state.chatter) {
+      if (!$scope.state.chatter) {
         $scope.state.chatter = [];
       }
       $scope.state.chatter.push({
         type: 'roll',
         numDice: stuff.numDice,
         diceValue: stuff.diceValue,
-        results: results
+        results: results,
+        time: new Date()
       });
       saveState();
     }
 
     function sendCurrentMessage() {
-      if(stuff.currentMessage.trim().length) {
+      if (stuff.currentMessage.trim().length) {
         $scope.state.chatter.push({
-          body: stuff.currentMessage
+          body: stuff.currentMessage,
+          time: new Date()
         });
         stuff.currentMessage = '';
         saveState();
