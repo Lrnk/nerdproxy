@@ -66,3 +66,10 @@ svg.game-entities {
   fill: white;
 }
 
+.select-box {
+  fill: none;
+  stroke: lime;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+

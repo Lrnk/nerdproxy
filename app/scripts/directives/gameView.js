@@ -130,6 +130,10 @@ angular.module('nerdproxyApp')
 
           $document.on('mousedown', function modelMouseDown(e) {
 
+            if (stuff.mode !== Mode.DEFAULT) {
+              return;
+            }
+
             if (e.target.tagName !== 'circle') {
               return;
             }
@@ -205,7 +209,7 @@ angular.module('nerdproxyApp')
             topOffset = element[0].offsetTop + gameScroll.y;
 
             var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb: e.pageY;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb : e.pageY;
 
             startPageXPx = pointerPosX - leftOffset;
             startPageYPx = pointerPosY - topOffset;
@@ -232,7 +236,7 @@ angular.module('nerdproxyApp')
           function rangeCheckMouseMove(e) {
 
             var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb: e.pageY;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb : e.pageY;
 
             var posChangeXPx = startPageXPx - (pointerPosX - leftOffset);
             var posChangeYPx = startPageYPx - (pointerPosY - topOffset);
@@ -280,6 +284,72 @@ angular.module('nerdproxyApp')
           });
 
         }
+
+        (function initModelSelectionStuff() {
+          
+          var startXCm;
+          var startYCm;
+          var leftOffset;
+          var topOffset;
+          var selectBoxSnap;
+
+          $document.on('mousedown', function selectBoxMouseDown(e) {
+
+            if (stuff.mode !== Mode.DEFAULT) {
+              return;
+            }
+            if (!element.has($(e.target)).length) {
+              return;
+            }
+            if (e.target.tagName === 'circle') {
+              return;
+            }
+
+            leftOffset = element[0].offsetLeft + gameScroll.x;
+            topOffset = element[0].offsetTop + gameScroll.y;
+
+            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb : e.pageY;
+
+            startXCm = scope.pxToCm(pointerPosX - leftOffset);
+            startYCm = scope.pxToCm(pointerPosY - topOffset);
+
+            // draw box
+            selectBoxSnap = gameSnap.rect(startXCm, startYCm, 0, 0);
+            selectBoxSnap.addClass('select-box');
+
+            $document.on('mousemove', selectBoxMouseMove);
+            $document.on('mouseup', selectBoxMouseUp);
+
+          });
+
+          function selectBoxMouseMove(e) {
+
+            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb : e.pageY;
+
+            var posChangeXCm = startXCm - scope.pxToCm(pointerPosX - leftOffset);
+            var posChangeYCm = startYCm - scope.pxToCm(pointerPosY - topOffset);
+
+            selectBoxSnap.attr({
+              'x': Math.min(startXCm, startXCm - posChangeXCm),
+              'y': Math.min(startYCm, startYCm - posChangeYCm),
+              'width': Math.abs(posChangeXCm),
+              'height': Math.abs(posChangeYCm)
+            });
+
+          }
+
+          function selectBoxMouseUp() {
+
+            selectBoxSnap.remove();
+
+            $document.off('mousemove', selectBoxMouseMove);
+            $document.off('mouseup', selectBoxMouseUp);
+
+          }
+
+        })();
 
       }
     };
