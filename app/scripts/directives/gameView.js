@@ -79,7 +79,7 @@ angular.module('nerdproxyApp')
         });
 
         // this affects context menu being open
-        scope.$watch('stuff.selectedModelIds.length', function() {
+        scope.$watch('stuff.selectedModelIds.length', function () {
           $timeout(function () {
             refreshWindowSize();
           });
@@ -87,13 +87,13 @@ angular.module('nerdproxyApp')
 
         function refreshWindowSize() {
 
-          stuff.boardWidth = Math.min(stuff.maxBoardWidth - scope.getXSpaceForMenus(), $window.innerWidth);
-          stuff.boardHeight = Math.min(stuff.maxBoardHeight - scope.getYSpaceForMenus(), $window.innerHeight);
+          stuff.boardWidth = Math.min(stuff.maxBoardWidth, $window.innerWidth - scope.getXSpaceForMenus());
+          stuff.boardHeight = Math.min(stuff.maxBoardHeight, $window.innerHeight - scope.getYSpaceForMenus());
 
           var point6Recurring = (1 / 1.5);
 
-          stuff.boardWidth = Math.min(stuff.boardWidth, ((stuff.boardHeight - scope.getYSpaceForMenus()) / point6Recurring));
-          stuff.boardHeight = Math.min(stuff.boardHeight, ((stuff.boardWidth - scope.getXSpaceForMenus()) * point6Recurring));
+          stuff.boardWidth = Math.min(stuff.boardWidth, stuff.boardHeight / point6Recurring);
+          stuff.boardHeight = Math.min(stuff.boardHeight, stuff.boardWidth * point6Recurring);
         }
 
 
@@ -118,7 +118,7 @@ angular.module('nerdproxyApp')
               thisCircle.addClass('model inf model-id-' + modelId);
               thisCircle.attr('data-model-id', modelId);
 
-              if (_.contains(stuff.selectedModelIds, modelId)){
+              if (_.contains(stuff.selectedModelIds, modelId)) {
                 thisCircle.addClass('selected');
               }
 
