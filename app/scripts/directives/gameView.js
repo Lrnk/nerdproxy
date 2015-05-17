@@ -7,7 +7,7 @@
  * # gameControls
  */
 angular.module('nerdproxyApp')
-  .directive('gameView', function ($document, $timeout, $window) {
+  .directive('gameView', function ($document, $timeout, $window, Mode) {
     return {
       restrict: 'E',
       templateUrl: 'views/gameView.html',
@@ -42,7 +42,7 @@ angular.module('nerdproxyApp')
         var initialZoom;
         hammertime.on('pinchstart', function () {
 
-          if (!stuff.moveModeOn) {
+          if (stuff.mode !== Mode.MOVE_VIEW) {
             return;
           }
 
@@ -88,8 +88,8 @@ angular.module('nerdproxyApp')
         }
 
 
-        scope.$watch('stuff.moveModeOn', function () {
-          if (scope.stuff.moveModeOn) {
+        scope.$watch('stuff.mode', function () {
+          if (stuff.mode === Mode.MOVE_VIEW) {
             gameScroll.enable();
           } else {
             gameScroll.disable();
@@ -186,7 +186,7 @@ angular.module('nerdproxyApp')
 
           function rangeCheckMouseDown(e) {
 
-            if (!stuff.rangeCheckModeOn) {
+            if (stuff.mode !== Mode.RANGE) {
               return;
             }
             if (!element.has($(e.target)).length) {
@@ -242,7 +242,6 @@ angular.module('nerdproxyApp')
 
           function rangeCheckMouseUp() {
             // end move
-            scope.rangeCheckModeOn = false;
             $document.off('mousemove', rangeCheckMouseMove);
             $document.off('mouseup', rangeCheckMouseUp);
 

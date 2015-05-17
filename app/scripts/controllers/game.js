@@ -8,7 +8,12 @@
  * Controller of the nerdproxyApp
  */
 angular.module('nerdproxyApp')
-  .controller('GameCtrl', function ($scope, Ref) {
+  .constant('Mode', {
+    DEFAULT: 0,
+    MOVE_VIEW: 1,
+    RANGE: 2
+  })
+  .controller('GameCtrl', function ($scope, Ref, Mode) {
 
     var stuff = {
 
@@ -21,11 +26,10 @@ angular.module('nerdproxyApp')
 
       //fields
 
-      moveModeOn: false,
-      rangeCheckModeOn: false,
       zoomFactor: 1,
       boardWidth: 1000,
-      boardHeight: 666
+      boardHeight: 666,
+      mode: Mode.DEFAULT
 
     };
 
@@ -40,7 +44,9 @@ angular.module('nerdproxyApp')
       zoomIn: zoomIn,
       zoomOut: zoomOut,
 
-      pxToCm: pxToCm
+      pxToCm: pxToCm,
+
+      Mode: Mode
     });
 
     function pxToCm(px){
@@ -48,22 +54,30 @@ angular.module('nerdproxyApp')
     }
 
     function toggleMoveMode() {
-      stuff.moveModeOn = !stuff.moveModeOn;
+      if(stuff.mode === Mode.MOVE_VIEW) {
+        stuff.mode = Mode.DEFAULT;
+      } else {
+        stuff.mode = Mode.MOVE_VIEW;
+      }
     }
 
     function toggleRangeCheckMode() {
-      stuff.rangeCheckModeOn = !stuff.rangeCheckModeOn;
+      if(stuff.mode === Mode.RANGE) {
+        stuff.mode = Mode.DEFAULT;
+      } else {
+        stuff.mode = Mode.RANGE;
+      }
     }
 
     function zoomIn() {
 
-      if(stuff.moveModeOn) {
+      if(stuff.mode === Mode.MOVE_VIEW) {
         stuff.zoomFactor *= 1.5;
       }
     }
 
     function zoomOut() {
-      if(stuff.moveModeOn) {
+      if(stuff.mode === Mode.MOVE_VIEW) {
         stuff.zoomFactor /= 1.5;
         stuff.zoomFactor = Math.max(stuff.zoomFactor, 1);
       }
