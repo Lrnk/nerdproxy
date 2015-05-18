@@ -15,8 +15,8 @@ angular.module('nerdproxyApp')
     MOVE_SELECTION: 3
   })
   .filter('chatDate', function () {
-    return function (date) {
-      return new moment(date).calendar();
+    return function (time) {
+      return new moment(time).calendar();
     };
   })
   .controller('GameCtrl', function ($scope, Ref, Mode) {
