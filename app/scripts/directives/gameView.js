@@ -7,7 +7,7 @@
  * # gameControls
  */
 angular.module('nerdproxyApp')
-  .directive('gameView', function ($document, $timeout, $window, Mode) {
+  .directive('gameView', function ($document, $timeout, $window, Inf, Mode) {
     return {
       restrict: 'E',
       templateUrl: 'views/gameView.html',
@@ -18,6 +18,8 @@ angular.module('nerdproxyApp')
 
         var stuff = scope.stuff;
         var gameSnap = Snap('.game-entities');
+        var models = [];
+
 
         var rangeLineSnap = gameSnap.line(0, 0, 0, 0);
         rangeLineSnap.addClass('range-line');
@@ -112,14 +114,28 @@ angular.module('nerdproxyApp')
 
           $timeout(function () {
 
-            gameSnap.selectAll('circle').remove();
-            angular.forEach(scope.state.models, function (model, modelId) {
-              var thisCircle = gameSnap.circle(model.xCm, model.yCm, 1.25);
-              thisCircle.addClass('model inf model-id-' + modelId);
-              thisCircle.attr('data-model-id', modelId);
+            models = [];
+            gameSnap.selectAll('.model').remove();
+            angular.forEach(scope.state.models, function (modelDatum, modelId) {
+
+              var model;
+
+              switch (modelDatum.type) {
+                case 'inf':
+                  model = new Inf(modelDatum, gameSnap);
+                  break;
+                case 'tank':
+                  var w = 4.25;
+                  var h = 5.5;
+                  //modelSnap = gameSnap.rect(model.xCm - (w / 2), model.yCm - (h / 2), w, h, 0.5);
+                  //modelSnap.addClass('tank');
+                  break;
+                default:
+                  console.log('Unrecognised model type: ' + modelDatum.type);
+              }
 
               if (_.contains(stuff.selectedModelIds, modelId)) {
-                thisCircle.addClass('selected');
+                model.select();
               }
 
               if (scope.state.range) {
@@ -149,7 +165,8 @@ angular.module('nerdproxyApp')
             // if we're in default mode, only move if we're clicking on a model
             // if we're in move_select mode, accept the selection as is and move it
             // else do nothing
-            if (stuff.mode === Mode.DEFAULT && e.target.tagName === 'circle') {
+            var targetClassName = e.target.className.baseVal ? e.target.className.baseVal : e.target.className
+            if (stuff.mode === Mode.DEFAULT && ~targetClassName.indexOf('model ')) {
 
               var targetIsAlreadySelected = stuff.selectedModelIds && _.contains(stuff.selectedModelIds, $(e.target).data('modelId'));
               if (!targetIsAlreadySelected) {
@@ -169,29 +186,9 @@ angular.module('nerdproxyApp')
             startPageXPx = pointerPosX - leftOffset;
             startPageYPx = pointerPosY - topOffset;
 
-            angular.forEach(gameSnap.selectAll('.model'), function (anyModelSnap) {
-              anyModelSnap.removeClass('selected');
-            });
             movingModels = _.map(stuff.selectedModelIds, function (modelId) {
-
-              var $model = element.find('.model-id-' + modelId);
-
-              var modelSnap = gameSnap.select('.model-id-' + modelId);
-              modelSnap.addClass('selected');
-              var modelCloneSnap = modelSnap.clone();
-              modelCloneSnap.addClass('move-shadow');
-              modelCloneSnap.attr({
-                'data-model-id': ''
-              });
-
-              return {
-                modelId: modelId,
-                model: scope.state.models[modelId],
-                $model: $model,
-                modelCloneSnap: modelCloneSnap,
-                startModelXCm: $window.parseInt($model.attr('cx')),
-                startModelYCm: $window.parseInt($model.attr('cy'))
-              }
+              models[modelId].startMove(startPageXPx, startPageYPx);
+              return models[modelId];
             });
 
 
@@ -209,44 +206,16 @@ angular.module('nerdproxyApp')
             var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
             var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - (stuff.mode !== Mode.MOVE_SELECTION ? spaceForThumb : 0) : e.pageY;
 
-            var posChangeXPx = startPageXPx - (pointerPosX - leftOffset);
-            var posChangeYPx = startPageYPx - (pointerPosY - topOffset);
-
             angular.forEach(movingModels, function (movingModel) {
-
-              var newXCm = movingModel.startModelXCm - scope.pxToCm(posChangeXPx);
-              var newYCm = movingModel.startModelYCm - scope.pxToCm(posChangeYPx);
-
-              var maxEdgeDist = movingModel.modelCloneSnap.attr('r') / 2;
-
-              newXCm = Math.max(newXCm, maxEdgeDist);
-              newXCm = Math.min(newXCm, stuff.boardWidthCm - maxEdgeDist);
-
-              newYCm = Math.max(newYCm, maxEdgeDist);
-              newYCm = Math.min(newYCm, stuff.boardHeightCm - maxEdgeDist);
-
-              movingModel.modelCloneSnap.attr('cx', newXCm);
-              movingModel.modelCloneSnap.attr('cy', newYCm);
+              movingModel.continueMove((pointerPosX - leftOffset), (pointerPosY - topOffset));
             });
-
 
           }
 
           function modelMouseUp() {
 
             angular.forEach(movingModels, function (movingModel) {
-
-              movingModel.model.xCm = movingModel.modelCloneSnap.attr('cx');
-              movingModel.model.yCm = movingModel.modelCloneSnap.attr('cy');
-
-              movingModel.$model.attr('cx', movingModel.modelCloneSnap.cx);
-              movingModel.$model.attr('cy', movingModel.modelCloneSnap.cy);
-
-              movingModel.modelCloneSnap.remove();
-            });
-
-            stuff.selectedModelIds = _.map(movingModels, function (movingModel) {
-              return movingModel.modelId;
+              movingModel.endMove();
             });
 
             movingModels = [];
@@ -386,7 +355,8 @@ angular.module('nerdproxyApp')
             if (!element.has($(e.target)).length) {
               return;
             }
-            if (e.target.tagName === 'circle') {
+            var targetClassName = e.target.className.baseVal ? e.target.className.baseVal : e.target.className;
+            if (~targetClassName.indexOf('model ')) {
               return;
             }
 
