@@ -13,6 +13,9 @@ angular.module('nerdproxyApp')
 
       this.modelData = modelData;
       this.snap = snap;
+      this.id = modelData.id;
+      this.xCm = modelData.xCm;
+      this.yCm = modelData.yCm;
     }
 
 
@@ -72,6 +75,10 @@ angular.module('nerdproxyApp')
 
       select: function () {
         this.snap.addClass('selected');
+      },
+
+      deselect: function () {
+        this.snap.removeClass('selected');
       }
 
     };

@@ -123,6 +123,7 @@ angular.module('nerdproxyApp')
               switch (modelDatum.type) {
                 case 'inf':
                   model = new Inf(modelDatum, gameSnap);
+                  models.push(model);
                   break;
                 case 'tank':
                   var w = 4.25;
@@ -404,12 +405,12 @@ angular.module('nerdproxyApp')
             });
 
             modelsWithin = [];
-            angular.forEach(scope.state.models, function (model, modelId) {
+            angular.forEach(models, function (model) {
               if (model.xCm > x && model.xCm < (x + w) && model.yCm > y && model.yCm < (y + h)) {
                 modelsWithin.push(model);
-                gameSnap.select('.model-id-' + modelId).addClass('selected');
+                model.select();
               } else {
-                gameSnap.select('.model-id-' + modelId).removeClass('selected');
+                model.deselect();
               }
             });
           }
