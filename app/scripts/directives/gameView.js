@@ -7,7 +7,7 @@
  * # gameControls
  */
 angular.module('nerdproxyApp')
-  .directive('gameView', function ($document, $timeout, $window, Inf, Mode) {
+  .directive('gameView', function ($document, $timeout, $window, Inf, LargeInf, Mode) {
     return {
       restrict: 'E',
       templateUrl: 'views/gameView.html',
@@ -122,8 +122,10 @@ angular.module('nerdproxyApp')
 
               switch (modelDatum.type) {
                 case 'inf':
-                  model = new Inf(modelDatum, gameSnap);
-                  models.push(model);
+                  model = new Inf(modelDatum);
+                  break;
+                case 'largeInf':
+                  model = new LargeInf(modelDatum);
                   break;
                 case 'tank':
                   var w = 4.25;
@@ -133,7 +135,11 @@ angular.module('nerdproxyApp')
                   break;
                 default:
                   console.log('Unrecognised model type: ' + modelDatum.type);
+                  return;
               }
+
+              model.createSnap(gameSnap);
+              models.push(model);
 
               if (_.contains(stuff.selectedModelIds, modelId)) {
                 model.select();
@@ -227,7 +233,9 @@ angular.module('nerdproxyApp')
             $document.off('touchend', modelMouseUp);
             $document.off('touchcancel', modelMouseUp);
 
-            scope.saveState(_.map(models, function(model) {return model.getSyncData()}));
+            scope.saveState(_.map(models, function (model) {
+              return model.getSyncData()
+            }));
 
             scope.$apply();
           }
@@ -312,7 +320,9 @@ angular.module('nerdproxyApp')
             $document.off('touchcancel', rangeCheckMouseUp);
 
             scope.state.range = range;
-            scope.saveState(_.map(models, function(model) {return model.getSyncData()}));
+            scope.saveState(_.map(models, function (model) {
+              return model.getSyncData()
+            }));
 
             scope.$apply();
           }

@@ -3,23 +3,25 @@
 angular.module('nerdproxyApp')
   .factory('Inf', function (BoardInfo) {
 
-    var baseRadius = 1.25;
-
-    function Inf(modelData, gameSnap) {
+    function Inf(modelData) {
 
       this.id = modelData.id;
       this.xCm = modelData.xCm;
       this.yCm = modelData.yCm;
 
-      var snap = gameSnap.circle(this.xCm, this.yCm, baseRadius);
-      snap.addClass('model inf model-id-' + this.id);
-      snap.attr('data-model-id', this.id);
-
-      this.snap = snap;
+      this.baseRadius = 1.25;
     }
 
 
     Inf.prototype = {
+
+      createSnap: function(gameSnap){
+        var snap = gameSnap.circle(this.xCm, this.yCm, this.baseRadius);
+        snap.addClass('model inf model-id-' + this.id);
+        snap.attr('data-model-id', this.id);
+
+        this.snap = snap;
+      },
 
       setPos: function (xCm, yCm) {
 
@@ -51,7 +53,7 @@ angular.module('nerdproxyApp')
         var newXCm = this.xCm - BoardInfo.pxToCm(changeXPx);
         var newYCm = this.yCm - BoardInfo.pxToCm(changeYPx);
 
-        var maxEdgeDist = baseRadius / 2;
+        var maxEdgeDist = this.baseRadius / 2;
 
         newXCm = Math.max(newXCm, maxEdgeDist);
         newXCm = Math.min(newXCm, BoardInfo.widthCm - maxEdgeDist);
