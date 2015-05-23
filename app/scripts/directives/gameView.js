@@ -227,7 +227,7 @@ angular.module('nerdproxyApp')
             $document.off('touchend', modelMouseUp);
             $document.off('touchcancel', modelMouseUp);
 
-            scope.saveState();
+            scope.saveState(_.map(models, function(model) {return model.getSyncData()}));
 
             scope.$apply();
           }
@@ -312,7 +312,7 @@ angular.module('nerdproxyApp')
             $document.off('touchcancel', rangeCheckMouseUp);
 
             scope.state.range = range;
-            scope.saveState();
+            scope.saveState(_.map(models, function(model) {return model.getSyncData()}));
 
             scope.$apply();
           }

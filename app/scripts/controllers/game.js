@@ -169,7 +169,11 @@ angular.module('nerdproxyApp')
       $scope.$broadcast('refreshState');
     });
 
-    function saveState() {
+    // todo make stuff so it only sends what's changed?
+    function saveState(models) {
+
+      $scope.state.models = models;
+
       Ref.child('game1').set(angular.fromJson(angular.toJson($scope.state)));
     }
 

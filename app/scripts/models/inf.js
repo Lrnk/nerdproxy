@@ -7,15 +7,15 @@ angular.module('nerdproxyApp')
 
     function Inf(modelData, gameSnap) {
 
-      var snap = gameSnap.circle(modelData.xCm, modelData.yCm, baseRadius);
-      snap.addClass('model inf model-id-' + modelData.id);
-      snap.attr('data-model-id', modelData.id);
-
-      this.modelData = modelData;
-      this.snap = snap;
       this.id = modelData.id;
       this.xCm = modelData.xCm;
       this.yCm = modelData.yCm;
+
+      var snap = gameSnap.circle(this.xCm, this.yCm, baseRadius);
+      snap.addClass('model inf model-id-' + this.id);
+      snap.attr('data-model-id', this.id);
+
+      this.snap = snap;
     }
 
 
@@ -23,8 +23,8 @@ angular.module('nerdproxyApp')
 
       setPos: function (xCm, yCm) {
 
-        this.modelData.xCm = xCm;
-        this.modelData.yCm = yCm;
+        this.xCm = xCm;
+        this.yCm = yCm;
 
         this.snap.attr('cx', xCm);
         this.snap.attr('cy', yCm);
@@ -44,13 +44,12 @@ angular.module('nerdproxyApp')
       continueMove: function (xCm, yCm) {
 
         var move = this.moveInProgress;
-        var modelData = this.modelData;
 
         var changeXPx = move.startXPx - xCm;
         var changeYPx = move.startYPx - yCm;
 
-        var newXCm = modelData.xCm - BoardInfo.pxToCm(changeXPx);
-        var newYCm = modelData.yCm - BoardInfo.pxToCm(changeYPx);
+        var newXCm = this.xCm - BoardInfo.pxToCm(changeXPx);
+        var newYCm = this.yCm - BoardInfo.pxToCm(changeYPx);
 
         var maxEdgeDist = baseRadius / 2;
 
@@ -79,6 +78,15 @@ angular.module('nerdproxyApp')
 
       deselect: function () {
         this.snap.removeClass('selected');
+      },
+
+      getSyncData: function() {
+        return {
+          id: this.id,
+          xCm: this.xCm,
+          yCm: this.yCm,
+          type: 'inf'
+        }
       }
 
     };
