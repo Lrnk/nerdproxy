@@ -6,9 +6,23 @@ angular.module('nerdproxyApp')
       restrict: 'E',
       templateUrl: 'views/modelControls.html',
       replace: true,
-      link: function postLink() {
+      scope: true,
+      controller: function($scope) {
 
+        $scope._ = _;
 
+        $scope.$on('modelSelection', function(e, selectedModels) {
+
+          if(selectedModels && selectedModels.length) {
+            $scope.menuItems = selectedModels[0].getContextMenuItems();
+          } else {
+            $scope.menuItems = [];
+          }
+
+        })
+      },
+
+      link: function postLink(scope) {
       }
     };
   });

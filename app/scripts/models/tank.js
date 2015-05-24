@@ -128,6 +128,12 @@ angular.module('nerdproxyApp')
         this.rotationInProgress = undefined;
       },
 
+      getContextMenuItems: function() {
+        return Model.prototype.getContextMenuItems.call(this).concat([
+          'rotate'
+        ]);
+      },
+
       getSyncData: function () {
         return {
           id: this.id,

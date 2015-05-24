@@ -1,8 +1,8 @@
 <div class="game">
   <game-view></game-view>
   <game-controls></game-controls>
-  <model-controls ng-if="stuff.selectedModelIds.length === 1"></model-controls>
-  <selection-controls ng-if="stuff.selectedModelIds.length > 1"></selection-controls>
+  <model-controls ng-show="stuff.selectedModelIds.length === 1"></model-controls>
+  <selection-controls ng-show="stuff.selectedModelIds.length > 1"></selection-controls>
 
   <chat-box ng-style="{
     bottom: stuff.selectedModelIds.length > 0 ? 100 : 50

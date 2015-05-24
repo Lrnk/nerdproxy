@@ -24,6 +24,12 @@ angular.module('nerdproxyApp')
 
       deselect: function () {
         this.snap.removeClass('selected');
+      },
+
+      getContextMenuItems: function() {
+        return [
+          'move'
+        ]
       }
 
     };

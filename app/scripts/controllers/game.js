@@ -38,7 +38,9 @@ angular.module('nerdproxyApp')
 
       currentMessage: '',
       numDice: 1,
-      diceValue: 6
+      diceValue: 6,
+
+      models: []
 
     };
 

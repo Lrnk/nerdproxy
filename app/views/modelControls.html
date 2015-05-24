@@ -2,6 +2,7 @@
 
   <div
     class="button"
+    ng-if="_.contains(menuItems, 'move')"
     ng-click="toggleMoveSelectionMode()"
     ng-class="{'on': stuff.mode === Mode.MOVE_SELECTION}"
     >
@@ -10,6 +11,7 @@
 
   <div
     class="button"
+    ng-if="_.contains(menuItems, 'rotate')"
     ng-click="toggleRotateMode()"
     ng-class="{'on': stuff.mode === Mode.ROTATE}"
     >

@@ -18,7 +18,6 @@ angular.module('nerdproxyApp')
 
         var stuff = scope.stuff;
         var gameSnap = Snap('.game-entities');
-        var models = [];
 
 
         var rangeLineSnap = gameSnap.line(0, 0, 0, 0);
@@ -81,7 +80,7 @@ angular.module('nerdproxyApp')
         });
 
         // this affects context menu being open
-        scope.$watch('stuff.selectedModelIds.length', function () {
+        scope.$on('modelSelection', function () {
           $timeout(function () {
             refreshWindowSize();
           });
@@ -114,7 +113,7 @@ angular.module('nerdproxyApp')
 
           $timeout(function () {
 
-            models = [];
+            stuff.models = [];
             gameSnap.selectAll('.model').remove();
             angular.forEach(scope.state.models, function (modelDatum, modelId) {
 
@@ -136,7 +135,7 @@ angular.module('nerdproxyApp')
               }
 
               model.createSnap(gameSnap);
-              models.push(model);
+              stuff.models.push(model);
 
               if (_.contains(stuff.selectedModelIds, modelId)) {
                 model.select();
@@ -176,6 +175,7 @@ angular.module('nerdproxyApp')
               var targetIsAlreadySelected = stuff.selectedModelIds && _.contains(stuff.selectedModelIds, modelId);
               if (!targetIsAlreadySelected) {
                 stuff.selectedModelIds = [modelId];
+                scope.$broadcast('modelSelection', [stuff.models[modelId]])
               }
 
             } else if (stuff.mode !== Mode.MOVE_SELECTION) {
@@ -192,8 +192,8 @@ angular.module('nerdproxyApp')
             startPageYPx = pointerPosY - topOffset;
 
             movingModels = _.map(stuff.selectedModelIds, function (modelId) {
-              models[modelId].startMove(startPageXPx, startPageYPx);
-              return models[modelId];
+              stuff.models[modelId].startMove(startPageXPx, startPageYPx);
+              return stuff.models[modelId];
             });
 
 
@@ -231,7 +231,7 @@ angular.module('nerdproxyApp')
             $document.off('touchend', modelMouseUp);
             $document.off('touchcancel', modelMouseUp);
 
-            scope.saveState(_.map(models, function (model) {
+            scope.saveState(_.map(stuff.models, function (model) {
               return model.getSyncData()
             }));
 
@@ -261,7 +261,7 @@ angular.module('nerdproxyApp')
               return;
             }
 
-            model = models[stuff.selectedModelIds[0]];
+            model = stuff.models[stuff.selectedModelIds[0]];
 
             leftOffset = element[0].offsetLeft + gameScroll.x;
             topOffset = element[0].offsetTop + gameScroll.y;
@@ -315,7 +315,7 @@ angular.module('nerdproxyApp')
             $document.off('touchend', modelRotateMouseUp);
             $document.off('touchcancel', modelRotateMouseUp);
 
-            scope.saveState(_.map(models, function (model) {
+            scope.saveState(_.map(stuff.models, function (model) {
               return model.getSyncData()
             }));
 
@@ -403,7 +403,7 @@ angular.module('nerdproxyApp')
             $document.off('touchcancel', rangeCheckMouseUp);
 
             scope.state.range = range;
-            scope.saveState(_.map(models, function (model) {
+            scope.saveState(_.map(stuff.models, function (model) {
               return model.getSyncData()
             }));
 
@@ -497,7 +497,7 @@ angular.module('nerdproxyApp')
             });
 
             modelsWithin = [];
-            angular.forEach(models, function (model) {
+            angular.forEach(stuff.models, function (model) {
               if (model.xCm > x && model.xCm < (x + w) && model.yCm > y && model.yCm < (y + h)) {
                 modelsWithin.push(model);
                 model.select();
@@ -514,6 +514,8 @@ angular.module('nerdproxyApp')
             stuff.selectedModelIds = _.map(modelsWithin, function (model) {
               return model.id;
             });
+
+            scope.$broadcast('modelSelection', modelsWithin);
 
             $document.off('mousemove', selectBoxMouseMove);
             $document.off('mouseup', selectBoxMouseUp);
