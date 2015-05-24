@@ -5,10 +5,13 @@ angular.module('nerdproxyApp')
 
     function LargeInf(modelData) {
       Inf.call(this, modelData);
-      this.baseRadius = 2;
     }
 
     LargeInf.prototype = Object.create(Inf.prototype, {
+      baseRadius: {
+        value: 2
+      },
+
       getSyncData: {
         value: function () {
           return {

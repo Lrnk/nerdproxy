@@ -8,12 +8,12 @@ angular.module('nerdproxyApp')
       this.id = modelData.id;
       this.xCm = modelData.xCm;
       this.yCm = modelData.yCm;
-
-      this.baseRadius = 1.25;
     }
 
 
     Inf.prototype = {
+
+      baseRadius: 1.25,
 
       createSnap: function(gameSnap){
         var snap = gameSnap.circle(this.xCm, this.yCm, this.baseRadius);
