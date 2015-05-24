@@ -7,7 +7,7 @@
  * # gameControls
  */
 angular.module('nerdproxyApp')
-  .directive('gameView', function ($document, $timeout, $window, Inf, LargeInf, Mode) {
+  .directive('gameView', function ($document, $timeout, $window, Inf, LargeInf, Tank, Mode) {
     return {
       restrict: 'E',
       templateUrl: 'views/gameView.html',
@@ -128,10 +128,7 @@ angular.module('nerdproxyApp')
                   model = new LargeInf(modelDatum);
                   break;
                 case 'tank':
-                  var w = 4.25;
-                  var h = 5.5;
-                  //modelSnap = gameSnap.rect(model.xCm - (w / 2), model.yCm - (h / 2), w, h, 0.5);
-                  //modelSnap.addClass('tank');
+                  model = new Tank(modelDatum);
                   break;
                 default:
                   console.log('Unrecognised model type: ' + modelDatum.type);
