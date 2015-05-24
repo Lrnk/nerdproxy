@@ -93,6 +93,11 @@ angular.module('nerdproxyApp')
 
     function sendCurrentMessage() {
       if (stuff.currentMessage.trim().length) {
+
+        if (!$scope.state.chatter) {
+          $scope.state.chatter = [];
+        }
+
         $scope.state.chatter.push({
           body: stuff.currentMessage,
           time: new Date()
@@ -165,9 +170,9 @@ angular.module('nerdproxyApp')
     });
 
     // todo make stuff so it only sends what's changed
-    function saveState(models) {
+    function saveState() {
 
-      $scope.state.models = models;
+      $scope.state.models = _.map($scope.stuff.models, function(model) {return model.getSyncData();});
 
       Ref.child('game1').set(angular.fromJson(angular.toJson($scope.state)));
     }

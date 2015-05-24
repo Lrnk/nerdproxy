@@ -231,9 +231,7 @@ angular.module('nerdproxyApp')
             $document.off('touchend', modelMouseUp);
             $document.off('touchcancel', modelMouseUp);
 
-            scope.saveState(_.map(stuff.models, function (model) {
-              return model.getSyncData()
-            }));
+            scope.saveState();
 
             scope.$apply();
           }
@@ -315,9 +313,7 @@ angular.module('nerdproxyApp')
             $document.off('touchend', modelRotateMouseUp);
             $document.off('touchcancel', modelRotateMouseUp);
 
-            scope.saveState(_.map(stuff.models, function (model) {
-              return model.getSyncData()
-            }));
+            scope.saveState();
 
             scope.$apply();
           }
@@ -403,9 +399,7 @@ angular.module('nerdproxyApp')
             $document.off('touchcancel', rangeCheckMouseUp);
 
             scope.state.range = range;
-            scope.saveState(_.map(stuff.models, function (model) {
-              return model.getSyncData()
-            }));
+            scope.saveState();
 
             scope.$apply();
           }
