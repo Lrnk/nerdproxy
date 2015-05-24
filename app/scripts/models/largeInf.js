@@ -7,24 +7,23 @@ angular.module('nerdproxyApp')
       Inf.call(this, modelData);
     }
 
-    LargeInf.prototype = Object.create(Inf.prototype, {
-      baseRadius: {
-        value: 2
-      },
+    LargeInf.prototype = Object.create(Inf.prototype);
 
-      getSyncData: {
-        value: function () {
-          return {
-            id: this.id,
-            xCm: this.xCm,
-            yCm: this.yCm,
-            type: 'largeInf'
-          }
+    _.extend(LargeInf.prototype, {
+
+      constructor: LargeInf,
+
+      baseRadius: 2,
+
+      getSyncData: function () {
+        return {
+          id: this.id,
+          xCm: this.xCm,
+          yCm: this.yCm,
+          type: 'largeInf'
         }
       }
     });
-
-    LargeInf.prototype.constructor = LargeInf;
 
     return (LargeInf);
 

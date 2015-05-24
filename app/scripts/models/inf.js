@@ -1,17 +1,22 @@
 'use strict';
 
 angular.module('nerdproxyApp')
-  .factory('Inf', function (BoardInfo) {
+  .factory('Inf', function (BoardInfo, Model) {
 
     function Inf(modelData) {
+
+      Model.call(this);
 
       this.id = modelData.id;
       this.xCm = modelData.xCm;
       this.yCm = modelData.yCm;
     }
 
+    Inf.prototype = Object.create(Model.prototype);
 
-    Inf.prototype = {
+    _.extend(Inf.prototype, {
+
+      constructor: Inf,
 
       baseRadius: 1.25,
 
@@ -74,14 +79,6 @@ angular.module('nerdproxyApp')
         this.moveInProgress = undefined;
       },
 
-      select: function () {
-        this.snap.addClass('selected');
-      },
-
-      deselect: function () {
-        this.snap.removeClass('selected');
-      },
-
       getSyncData: function() {
         return {
           id: this.id,
@@ -91,7 +88,7 @@ angular.module('nerdproxyApp')
         }
       }
 
-    };
+    });
 
     return (Inf);
 
