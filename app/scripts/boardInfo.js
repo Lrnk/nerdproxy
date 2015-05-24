@@ -3,36 +3,28 @@
 angular.module('nerdproxyApp').
   service('BoardInfo', function () {
 
-    var maxWidthPx = 1000;
-    var maxHeightPx = 666;
+    var boardInfo = {
+      maxWidthPx: 1000,
+      maxHeightPx: 666,
 
-    var widthPx = 1000;
-    var heightPx = 666;
+      widthPx: 1000,
+      heightPx: 666,
 
-    var widthCm = 182.88;
-    var heightCm = 121.92;
+      widthCm: 182.88,
+      heightCm: 121.92,
 
-    var zoomFactor = 1;
-
-
-    return {
-      maxWidthPx: maxWidthPx,
-      maxHeightPx: maxHeightPx,
-
-      widthPx: widthPx,
-      heightPx: heightPx,
-
-      widthCm: widthCm,
-      heightCm: heightCm,
-
-      zoomFactor: zoomFactor,
+      zoomFactor: 1,
 
       pxToCm: pxToCm
+
     };
+
+    return boardInfo;
+
 
 
     function pxToCm(px) {
-      return px * ((widthCm / widthPx) / zoomFactor);
+      return px * ((boardInfo.widthCm / boardInfo.widthPx) / boardInfo.zoomFactor);
     }
 
   });

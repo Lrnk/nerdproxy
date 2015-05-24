@@ -19,16 +19,9 @@ angular.module('nerdproxyApp')
       return new moment(time).calendar();
     };
   })
-  .controller('GameCtrl', function ($scope, Ref, Mode) {
+  .controller('GameCtrl', function ($scope, Ref, Mode, BoardInfo) {
 
     var stuff = {
-
-      // constants
-      maxBoardWidth: 1000,
-      maxBoardHeight: 666,
-
-      boardWidthCm: 182.88,
-      boardHeightCm: 121.92,
 
       onMobile: (function onMobile() {
         try {
@@ -40,11 +33,6 @@ angular.module('nerdproxyApp')
         }
       })(),
 
-      //fields
-
-      zoomFactor: 1,
-      boardWidth: 1000,
-      boardHeight: 666,
       mode: Mode.DEFAULT,
 
       currentMessage: '',
@@ -56,6 +44,7 @@ angular.module('nerdproxyApp')
     angular.extend($scope, {
 
       stuff: stuff,
+      BoardInfo: BoardInfo,
 
       saveState: saveState,
 
@@ -67,8 +56,6 @@ angular.module('nerdproxyApp')
 
       getXSpaceForMenus: getXSpaceForMenus,
       getYSpaceForMenus: getYSpaceForMenus,
-
-      pxToCm: pxToCm,
 
       Mode: Mode,
 
@@ -117,10 +104,6 @@ angular.module('nerdproxyApp')
 
     function getYSpaceForMenus() {
       return stuff.selectedModelIds && stuff.selectedModelIds.length ? 250 : 200;
-    }
-
-    function pxToCm(px) {
-      return px * ((stuff.boardWidthCm / stuff.boardWidth) / stuff.zoomFactor);
     }
 
     function toggleMoveMode() {

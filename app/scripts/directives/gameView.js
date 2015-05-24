@@ -7,7 +7,7 @@
  * # gameControls
  */
 angular.module('nerdproxyApp')
-  .directive('gameView', function ($document, $timeout, $window, Inf, LargeInf, Tank, Mode) {
+  .directive('gameView', function ($document, $timeout, $window, Inf, LargeInf, Tank, Mode, BoardInfo) {
     return {
       restrict: 'E',
       templateUrl: 'views/gameView.html',
@@ -27,7 +27,7 @@ angular.module('nerdproxyApp')
         var rangeInfoSnap = gameSnap.text(0, 0, '');
         rangeInfoSnap.addClass('range-info-text');
 
-        element.find('svg')[0].setAttribute('viewBox', '0 0 ' + stuff.boardWidthCm + ' ' + stuff.boardHeightCm);
+        element.find('svg')[0].setAttribute('viewBox', '0 0 ' + BoardInfo.widthCm + ' ' + BoardInfo.heightCm);
 
         var gameScroll = new IScroll(element[0], {
           scrollbars: true,
@@ -48,7 +48,7 @@ angular.module('nerdproxyApp')
             return;
           }
 
-          initialZoom = stuff.zoomFactor;
+          initialZoom = BoardInfo.zoomFactor;
           hammertime.on('pinchmove', pinchMoveZoom);
 
           hammertime.on('pinchend', removePinchMoveZoom);
@@ -62,11 +62,11 @@ angular.module('nerdproxyApp')
 
         function pinchMoveZoom(e) {
           scope.$apply(function () {
-            stuff.zoomFactor = Math.max(initialZoom + (e.scale - 1), 1);
+            BoardInfo.zoomFactor = Math.max(initialZoom + (e.scale - 1), 1);
           })
         }
 
-        scope.$watch('stuff.zoomFactor', function (newVal) {
+        scope.$watch('BoardInfo.zoomFactor', function (newVal) {
           if (newVal) {
             gameScroll.refresh();
           }
@@ -89,13 +89,13 @@ angular.module('nerdproxyApp')
 
         function refreshWindowSize() {
 
-          stuff.boardWidth = Math.min(stuff.maxBoardWidth, $window.innerWidth - scope.getXSpaceForMenus());
-          stuff.boardHeight = Math.min(stuff.maxBoardHeight, $window.innerHeight - scope.getYSpaceForMenus());
+          BoardInfo.widthPx = Math.min(BoardInfo.maxWidthPx, $window.innerWidth - scope.getXSpaceForMenus());
+          BoardInfo.heightPx = Math.min(BoardInfo.maxHeightPx, $window.innerHeight - scope.getYSpaceForMenus());
 
           var point6Recurring = (1 / 1.5);
 
-          stuff.boardWidth = Math.min(stuff.boardWidth, stuff.boardHeight / point6Recurring);
-          stuff.boardHeight = Math.min(stuff.boardHeight, stuff.boardWidth * point6Recurring);
+          BoardInfo.widthPx = Math.min(BoardInfo.widthPx, BoardInfo.heightPx / point6Recurring);
+          BoardInfo.heightPx = Math.min(BoardInfo.heightPx, BoardInfo.widthPx * point6Recurring);
         }
 
 
@@ -277,10 +277,10 @@ angular.module('nerdproxyApp')
             $document.on('touchcancel', rangeCheckMouseUp);
 
             range = {
-              x1Cm: scope.pxToCm(startPageXPx),
-              y1Cm: scope.pxToCm(startPageYPx),
-              x2Cm: scope.pxToCm(startPageXPx),
-              y2Cm: scope.pxToCm(startPageYPx),
+              x1Cm: BoardInfo.pxToCm(startPageXPx),
+              y1Cm: BoardInfo.pxToCm(startPageYPx),
+              x2Cm: BoardInfo.pxToCm(startPageXPx),
+              y2Cm: BoardInfo.pxToCm(startPageYPx),
               infoText: '0.0'
             };
 
@@ -298,10 +298,10 @@ angular.module('nerdproxyApp')
 
 
             var lengthPx = Math.sqrt(posChangeXPx * posChangeXPx + posChangeYPx * posChangeYPx);
-            var lengthInches = scope.pxToCm(lengthPx) * 0.393700787;
+            var lengthInches = BoardInfo.pxToCm(lengthPx) * 0.393700787;
 
-            range.x2Cm = range.x1Cm - scope.pxToCm(posChangeXPx);
-            range.y2Cm = range.y1Cm - scope.pxToCm(posChangeYPx);
+            range.x2Cm = range.x1Cm - BoardInfo.pxToCm(posChangeXPx);
+            range.y2Cm = range.y1Cm - BoardInfo.pxToCm(posChangeYPx);
             range.infoText = lengthInches.toFixed(1);
 
             drawRangeLine(range);
@@ -374,8 +374,8 @@ angular.module('nerdproxyApp')
             var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
             var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
 
-            startXCm = scope.pxToCm(pointerPosX - leftOffset);
-            startYCm = scope.pxToCm(pointerPosY - topOffset);
+            startXCm = BoardInfo.pxToCm(pointerPosX - leftOffset);
+            startYCm = BoardInfo.pxToCm(pointerPosY - topOffset);
 
             selectBoxSnap = gameSnap.rect(startXCm, startYCm, 0, 0);
             selectBoxSnap.addClass('select-box');
@@ -396,8 +396,8 @@ angular.module('nerdproxyApp')
             var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
             var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
 
-            var posChangeXCm = startXCm - scope.pxToCm(pointerPosX - leftOffset);
-            var posChangeYCm = startYCm - scope.pxToCm(pointerPosY - topOffset);
+            var posChangeXCm = startXCm - BoardInfo.pxToCm(pointerPosX - leftOffset);
+            var posChangeYCm = startYCm - BoardInfo.pxToCm(pointerPosY - topOffset);
 
             var x = Math.min(startXCm, startXCm - posChangeXCm);
             var y = Math.min(startYCm, startYCm - posChangeYCm);

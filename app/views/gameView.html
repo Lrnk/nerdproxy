@@ -1,13 +1,13 @@
 <div class="game-view-wrapper"
      ng-style="{
-          width: (stuff.boardWidth) + 'px',
-          height: (stuff.boardHeight) + 'px'
+          width: (BoardInfo.widthPx) + 'px',
+          height: (BoardInfo.heightPx) + 'px'
          }"
   >
   <div class="game-view-scroller"
        ng-style="{
-          width: (stuff.zoomFactor * stuff.boardWidth) + 'px',
-          height: (stuff.zoomFactor * stuff.boardHeight) + 'px'
+          width: (BoardInfo.zoomFactor * BoardInfo.widthPx) + 'px',
+          height: (BoardInfo.zoomFactor * BoardInfo.heightPx) + 'px'
          }"
     >
 
