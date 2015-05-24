@@ -7,10 +7,10 @@ angular.module('nerdproxyApp')
 
       Model.call(this);
 
-      this.id = modelData.id;
-      this.xCm = window.parseInt(modelData.xCm);
-      this.yCm = window.parseInt(modelData.yCm);
-      this.rotation = window.parseInt(modelData.rotation);
+      this.id = Number(modelData.id);
+      this.xCm = Number(modelData.xCm);
+      this.yCm = Number(modelData.yCm);
+      this.rotation = Number(modelData.rotation);
     }
 
     Tank.prototype = Object.create(Model.prototype);
@@ -24,10 +24,14 @@ angular.module('nerdproxyApp')
 
       createSnap: function (gameSnap) {
 
-        var snap = gameSnap.rect(this.xCm, this.yCm, this.w, this.h, 0.5);
+        var snap = gameSnap.group();
+
+        snap.attr('transform', 'translate(' + this.xCm + ', ' + this.yCm + ')');
         snap.addClass('model tank');
         snap.attr('data-model-id', this.id);
-        snap.attr('transform', 'rotate(' + this.rotation + ' ' + (this.xCm + (this.w / 2)) + ' ' + (this.yCm + (this.h / 2)) + ')');
+
+        var rect = snap.rect( -(this.w / 2), -(this.h / 2), this.w, this.h, 0.5);
+        rect.attr('transform', 'rotate(' + this.rotation + ')');
 
         this.snap = snap;
       },
@@ -39,7 +43,7 @@ angular.module('nerdproxyApp')
 
         this.snap.attr('x', xCm);
         this.snap.attr('y', yCm);
-        this.snap.attr('transform', 'rotate(' + this.rotation + ' ' + (xCm + (this.w / 2)) + ' ' + (yCm + (this.h / 2)) + ')');
+        this.snap.attr('transform', 'translate(' + xCm + ' ' + yCm + ')');
 
       },
 
@@ -77,18 +81,21 @@ angular.module('nerdproxyApp')
         newYCm = Math.max(newYCm, maxEdgeDist.top);
         newYCm = Math.min(newYCm, BoardInfo.heightCm -maxEdgeDist.bottom);
 
-        move.ghostSnap.attr('x', newXCm);
-        move.ghostSnap.attr('y', newYCm);
-        move.ghostSnap.attr('transform', 'rotate(' + this.rotation + ' ' + (newXCm + (this.w / 2)) + ' ' + (newYCm + (this.h / 2)) + ')');
+        this.moveInProgress.hasMoved = true;
+        this.moveInProgress.lastXCm = newXCm;
+        this.moveInProgress.lastYCm = newYCm;
 
+        move.ghostSnap.attr('transform', 'translate(' + newXCm + ', ' + newYCm + ')');
 
       },
 
       endMove: function () {
-        var ghostSnap = this.moveInProgress.ghostSnap;
-        this.setPos(ghostSnap.attr('x'), ghostSnap.attr('y'));
-        ghostSnap.remove();
 
+        if(this.moveInProgress.hasMoved) {
+          this.setPos(this.moveInProgress.lastXCm, this.moveInProgress.lastYCm);
+        }
+
+        this.moveInProgress.ghostSnap.remove();
         this.moveInProgress = undefined;
       },
 
@@ -104,16 +111,21 @@ angular.module('nerdproxyApp')
 
       continueRotation: function (rotationChange) {
 
+        this.rotationInProgress.hasRotated = true;
         this.rotationInProgress.newRotation = this.rotation + rotationChange;
-        this.rotationInProgress.ghostSnap.attr('transform', 'rotate(' + this.rotationInProgress.newRotation + ' ' + (this.xCm + (this.w / 2)) + ' ' + (this.yCm + (this.h / 2)) + ')');
+        this.rotationInProgress.ghostSnap.select('rect').attr('transform', 'rotate(' + this.rotationInProgress.newRotation + ')');
 
       },
 
       endRotation: function () {
         this.rotationInProgress.ghostSnap.remove();
-        this.rotation = this.rotationInProgress.newRotation;
+
+        if(this.rotationInProgress.hasRotated) {
+          this.rotation = this.rotationInProgress.newRotation;
+          this.snap.select('rect').attr('transform', 'rotate(' + this.rotation + ')');
+        }
+
         this.rotationInProgress = undefined;
-        this.snap.attr('transform', 'rotate(' + this.rotation + ' ' + (this.xCm + (this.w / 2)) + ' ' + (this.yCm + (this.h / 2)) + ')');
       },
 
       getSyncData: function () {

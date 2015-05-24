@@ -162,7 +162,7 @@ angular.module('nerdproxyApp')
       $scope.$broadcast('refreshState');
     });
 
-    // todo make stuff so it only sends what's changed?
+    // todo make stuff so it only sends what's changed
     function saveState(models) {
 
       $scope.state.models = models;

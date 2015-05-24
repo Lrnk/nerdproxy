@@ -7,7 +7,7 @@
  * # gameControls
  */
 angular.module('nerdproxyApp')
-  .directive('gameView', function ($document, $timeout, $window, Inf, LargeInf, Tank, Mode, BoardInfo) {
+  .directive('gameView', function ($document, $timeout, $window, Model, Inf, LargeInf, Tank, Mode, BoardInfo) {
     return {
       restrict: 'E',
       templateUrl: 'views/gameView.html',
@@ -169,12 +169,13 @@ angular.module('nerdproxyApp')
             // if we're in default mode, only move if we're clicking on a model
             // if we're in move_select mode, accept the selection as is and move it
             // else do nothing
-            var targetClassName = e.target.className.baseVal ? e.target.className.baseVal : e.target.className
-            if (stuff.mode === Mode.DEFAULT && ~targetClassName.indexOf('model ')) {
 
-              var targetIsAlreadySelected = stuff.selectedModelIds && _.contains(stuff.selectedModelIds, $(e.target).data('modelId'));
+            var modelId = Model.getModelIdFromElement(e.target);
+            if (stuff.mode === Mode.DEFAULT && modelId !== undefined) {
+
+              var targetIsAlreadySelected = stuff.selectedModelIds && _.contains(stuff.selectedModelIds, modelId);
               if (!targetIsAlreadySelected) {
-                stuff.selectedModelIds = [$(e.target).data('modelId')];
+                stuff.selectedModelIds = [modelId];
               }
 
             } else if (stuff.mode !== Mode.MOVE_SELECTION) {
@@ -448,8 +449,7 @@ angular.module('nerdproxyApp')
             if (!element.has($(e.target)).length) {
               return;
             }
-            var targetClassName = e.target.className.baseVal ? e.target.className.baseVal : e.target.className;
-            if (~targetClassName.indexOf('model ')) {
+            if (Model.getModelIdFromElement(e.target) !== undefined) {
               return;
             }
 

@@ -28,8 +28,25 @@ angular.module('nerdproxyApp')
 
     };
 
-    return (Model);
+    _.extend(Model, {
 
+      getModelIdFromElement: function getModelIdFromElement(element) {
+
+        if (!element || !element instanceof SVGElement) {
+          return undefined;
+
+        } else if (element.className && element.className.baseVal && ~element.className.baseVal.indexOf('model ')) {
+          return $(element).data('modelId');
+
+        } else {
+          return getModelIdFromElement(element.parentElement);
+        }
+
+      }
+    });
+
+
+    return (Model);
 
 
     function abstractMethod() {
