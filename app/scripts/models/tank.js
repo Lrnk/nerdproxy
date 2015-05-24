@@ -8,8 +8,9 @@ angular.module('nerdproxyApp')
       Model.call(this);
 
       this.id = modelData.id;
-      this.xCm = modelData.xCm;
-      this.yCm = modelData.yCm;
+      this.xCm = window.parseInt(modelData.xCm);
+      this.yCm = window.parseInt(modelData.yCm);
+      this.rotation = window.parseInt(modelData.rotation);
     }
 
     Tank.prototype = Object.create(Model.prototype);
@@ -26,6 +27,7 @@ angular.module('nerdproxyApp')
         var snap = gameSnap.rect(this.xCm, this.yCm, this.w, this.h, 0.5);
         snap.addClass('model tank');
         snap.attr('data-model-id', this.id);
+        snap.attr('transform', 'rotate(' + this.rotation + ' ' + (this.xCm + (this.w / 2)) + ' ' + (this.yCm + (this.h / 2)) + ')');
 
         this.snap = snap;
       },
@@ -37,6 +39,8 @@ angular.module('nerdproxyApp')
 
         this.snap.attr('x', xCm);
         this.snap.attr('y', yCm);
+        this.snap.attr('transform', 'rotate(' + this.rotation + ' ' + (xCm + (this.w / 2)) + ' ' + (yCm + (this.h / 2)) + ')');
+
       },
 
       startMove: function (xPx, yPx) {
@@ -75,6 +79,8 @@ angular.module('nerdproxyApp')
 
         move.ghostSnap.attr('x', newXCm);
         move.ghostSnap.attr('y', newYCm);
+        move.ghostSnap.attr('transform', 'rotate(' + this.rotation + ' ' + (newXCm + (this.w / 2)) + ' ' + (newYCm + (this.h / 2)) + ')');
+
 
       },
 
@@ -91,6 +97,7 @@ angular.module('nerdproxyApp')
           id: this.id,
           xCm: this.xCm,
           yCm: this.yCm,
+          rotation: this.rotation,
           type: 'tank'
         }
       }
