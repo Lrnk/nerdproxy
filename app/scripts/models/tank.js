@@ -92,6 +92,30 @@ angular.module('nerdproxyApp')
         this.moveInProgress = undefined;
       },
 
+      startRotation: function () {
+        var ghostSnap = this.snap.clone();
+        ghostSnap.addClass('move-shadow');
+
+        this.rotationInProgress = {
+          ghostSnap: ghostSnap,
+          startRotation: this.rotation
+        }
+      },
+
+      continueRotation: function (rotationChange) {
+
+        this.rotationInProgress.newRotation = this.rotation + rotationChange;
+        this.rotationInProgress.ghostSnap.attr('transform', 'rotate(' + this.rotationInProgress.newRotation + ' ' + (this.xCm + (this.w / 2)) + ' ' + (this.yCm + (this.h / 2)) + ')');
+
+      },
+
+      endRotation: function () {
+        this.rotationInProgress.ghostSnap.remove();
+        this.rotation = this.rotationInProgress.newRotation;
+        this.rotationInProgress = undefined;
+        this.snap.attr('transform', 'rotate(' + this.rotation + ' ' + (this.xCm + (this.w / 2)) + ' ' + (this.yCm + (this.h / 2)) + ')');
+      },
+
       getSyncData: function () {
         return {
           id: this.id,

@@ -239,6 +239,91 @@ angular.module('nerdproxyApp')
 
         })();
 
+
+        (function initModelRotatingStuff() {
+
+          var model;
+          var leftOffset;
+          var topOffset;
+          var startAngleDegrees;
+
+          $document.on('mousedown', modelRotateMouseDown);
+          $document.on('touchstart', modelRotateMouseDown);
+
+          function modelRotateMouseDown(e) {
+
+            if (stuff.mode !== Mode.ROTATE) {
+              return;
+            }
+            if (stuff.selectedModelIds.length !== 1) {
+              console.log('invalid number of models selected: ' + stuff.selectedModelIds.length);
+              return;
+            }
+
+            model = models[stuff.selectedModelIds[0]];
+
+            leftOffset = element[0].offsetLeft + gameScroll.x;
+            topOffset = element[0].offsetTop + gameScroll.y;
+
+            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
+
+            var startPageXPx = pointerPosX - leftOffset;
+            var startPageYPx = pointerPosY - topOffset;
+
+            var xDistFromModelCm = model.xCm - BoardInfo.pxToCm(startPageXPx);
+            var yDistFromModelCm = model.yCm - BoardInfo.pxToCm(startPageYPx);
+
+            var angleRadians = Math.atan(yDistFromModelCm / xDistFromModelCm);
+            startAngleDegrees = angleRadians * (180 / Math.PI);
+
+            model.startRotation();
+
+            $document.on('mousemove', modelRotateMouseMove);
+            $document.on('mouseup', modelRotateMouseUp);
+
+            $document.on('touchmove', modelRotateMouseMove);
+            $document.on('touchend', modelRotateMouseUp);
+            $document.on('touchcancel', modelRotateMouseUp);
+
+          }
+
+          function modelRotateMouseMove(e) {
+
+            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
+            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
+
+            var xDistFromModelCm = model.xCm - BoardInfo.pxToCm(pointerPosX - leftOffset);
+            var yDistFromModelCm = model.yCm - BoardInfo.pxToCm(pointerPosY - topOffset);
+
+            var angleRadians = Math.atan(yDistFromModelCm / xDistFromModelCm);
+            var angleDegrees = angleRadians * (180 / Math.PI);
+
+            model.continueRotation(angleDegrees - startAngleDegrees);
+
+          }
+
+          function modelRotateMouseUp() {
+
+            model.endRotation();
+
+            $document.off('mousemove', modelRotateMouseMove);
+            $document.off('mouseup', modelRotateMouseUp);
+
+            $document.off('touchmove', modelRotateMouseMove);
+            $document.off('touchend', modelRotateMouseUp);
+            $document.off('touchcancel', modelRotateMouseUp);
+
+            scope.saveState(_.map(models, function (model) {
+              return model.getSyncData()
+            }));
+
+            scope.$apply();
+          }
+
+        })();
+
+
         (function initRangeCheckingStuff() {
 
           var startPageXPx;

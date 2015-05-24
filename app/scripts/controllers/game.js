@@ -12,7 +12,8 @@ angular.module('nerdproxyApp')
     DEFAULT: 0,
     MOVE_VIEW: 1,
     RANGE: 2,
-    MOVE_SELECTION: 3
+    MOVE_SELECTION: 3,
+    ROTATE: 4
   })
   .filter('chatDate', function () {
     return function (time) {
@@ -51,6 +52,7 @@ angular.module('nerdproxyApp')
       toggleMoveMode: toggleMoveMode,
       toggleRangeCheckMode: toggleRangeCheckMode,
       toggleMoveSelectionMode: toggleMoveSelectionMode,
+      toggleRotateMode: toggleRotateMode,
       zoomIn: zoomIn,
       zoomOut: zoomOut,
 
@@ -122,6 +124,14 @@ angular.module('nerdproxyApp')
       }
     }
 
+    function toggleRotateMode() {
+      if (stuff.mode === Mode.ROTATE) {
+        stuff.mode = Mode.DEFAULT;
+      } else {
+        stuff.mode = Mode.ROTATE;
+      }
+    }
+
     function toggleRangeCheckMode() {
       if (stuff.mode === Mode.RANGE) {
         stuff.mode = Mode.DEFAULT;
@@ -133,14 +143,14 @@ angular.module('nerdproxyApp')
     function zoomIn() {
 
       if (stuff.mode === Mode.MOVE_VIEW) {
-        stuff.zoomFactor *= 1.5;
+        BoardInfo.zoomFactor *= 1.5;
       }
     }
 
     function zoomOut() {
       if (stuff.mode === Mode.MOVE_VIEW) {
-        stuff.zoomFactor /= 1.5;
-        stuff.zoomFactor = Math.max(stuff.zoomFactor, 1);
+        BoardInfo.zoomFactor /= 1.5;
+        BoardInfo.zoomFactor = Math.max(BoardInfo.zoomFactor, 1);
       }
     }
 
