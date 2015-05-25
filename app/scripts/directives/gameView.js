@@ -175,6 +175,7 @@ angular.module('nerdproxyApp')
               var targetIsAlreadySelected = stuff.selectedModelIds && _.contains(stuff.selectedModelIds, modelId);
               if (!targetIsAlreadySelected) {
                 stuff.selectedModelIds = [modelId];
+                stuff.models[modelId].select();
                 scope.$broadcast('modelSelection', [stuff.models[modelId]])
               }
 
