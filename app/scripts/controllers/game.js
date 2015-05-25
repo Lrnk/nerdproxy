@@ -108,11 +108,23 @@ angular.module('nerdproxyApp')
     }
 
     function getXSpaceForMenus() {
-      return 0;
+
+      if($(window).width() > $(window).height()) {
+        return 300;
+      } else {
+        return 0;
+      }
+
     }
 
     function getYSpaceForMenus() {
-      return stuff.selectedModelIds && stuff.selectedModelIds.length ? 250 : 200;
+
+      if($(window).width() <= $(window).height()) {
+        return stuff.selectedModelIds && stuff.selectedModelIds.length ? 250 : 200;
+      } else {
+        return 0;
+      }
+
     }
 
     function toggleMoveMode() {

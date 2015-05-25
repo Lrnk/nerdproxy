@@ -7,6 +7,31 @@
   outline: 1px solid gold;
 }
 
+@media all and (orientation:landscape) {
+  .game-controls {
+    width: 50px;
+    top: 0;
+    height: 100%;
+  }
+}
+
+.left-controls-border {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  outline: 1px solid gold;
+  width: 150px;
+  top: 0;
+  height: 100%;
+  opacity: 0;
+}
+
+@media all and (orientation:landscape) {
+  .left-controls-border {
+    opacity: 1;
+  }
+}
+
 .model-controls {
   position: fixed;
   bottom: 50px;
@@ -14,6 +39,15 @@
   width: 100%;
   height: 50px;
   outline: 1px solid gold;
+}
+
+@media all and (orientation:landscape) {
+  .model-controls {
+    width: 50px;
+    top: 0;
+    left: 50px;
+    height: 100%;
+  }
 }
 
 .chat-box {
@@ -30,6 +64,25 @@
   height: 100px;
   overflow-x: hidden;
   outline: 1px solid red;
+}
+
+@media all and (orientation:landscape) {
+
+  .chat-box {
+    left: auto;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 150px;
+  }
+
+  .chat-box .chatter {
+    width: 100%;
+    height: 50%;
+    overflow-x: hidden;
+    outline: 1px solid red;
+  }
+
 }
 
 .button {

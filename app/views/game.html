@@ -1,5 +1,9 @@
 <div class="game">
   <game-view></game-view>
+
+  <!-- Because the left looks a bit weird in landscape if the sidebar isn't the same size as the chat box -->
+  <div class="left-controls-border"></div>
+
   <game-controls></game-controls>
   <model-controls ng-show="stuff.selectedModelIds.length === 1"></model-controls>
   <selection-controls ng-show="stuff.selectedModelIds.length > 1"></selection-controls>
