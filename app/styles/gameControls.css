@@ -130,3 +130,12 @@
 .dice-results {
   font-weight: bold;
 }
+
+/*colour-picker*/
+.sp-replacer {
+  display: inline-block;
+  vertical-align: top;
+  margin: 5px;
+  height: 35px;
+  width: 30px;
+}

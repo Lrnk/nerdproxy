@@ -10,6 +10,7 @@ angular.module('nerdproxyApp')
       this.id = Number(modelData.id);
       this.xCm = Number(modelData.xCm);
       this.yCm = Number(modelData.yCm);
+      this.colour = modelData.colour || 'green';
       this.rotation = Number(modelData.rotation);
     }
 
@@ -32,6 +33,7 @@ angular.module('nerdproxyApp')
 
         var rect = snap.rect( -(this.w / 2), -(this.h / 2), this.w, this.h, 0.5);
         rect.attr('transform', 'rotate(' + this.rotation + ')');
+        rect.attr('fill', this.colour);
 
         this.snap = snap;
       },
@@ -134,13 +136,19 @@ angular.module('nerdproxyApp')
         ]);
       },
 
+      setColour: function(colourHex) {
+        this.colour = colourHex;
+        this.snap.select('rect').attr('fill', colourHex);
+      },
+
       getSyncData: function () {
         return {
           id: this.id,
           xCm: this.xCm,
           yCm: this.yCm,
           rotation: this.rotation,
-          type: 'tank'
+          type: 'tank',
+          colour: this.colour
         }
       }
 

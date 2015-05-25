@@ -14,7 +14,8 @@
     "snap.svg": "~0.4.1",
     "hammerjs": "~2.0.4",
     "underscore": "~1.8.3",
-    "moment": "~2.10.3"
+    "moment": "~2.10.3",
+    "spectrum": "~1.7.0"
   },
   "devDependencies": {
     "mockfirebase": "0.11.0",

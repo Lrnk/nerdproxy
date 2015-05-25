@@ -44,7 +44,6 @@ svg.game-entities {
 
 .model {
   stroke: black;
-  fill: green;
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
 }

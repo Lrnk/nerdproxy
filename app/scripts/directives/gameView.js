@@ -176,7 +176,7 @@ angular.module('nerdproxyApp')
               if (!targetIsAlreadySelected) {
                 stuff.selectedModelIds = [modelId];
                 stuff.models[modelId].select();
-                scope.$broadcast('modelSelection', [stuff.models[modelId]])
+                scope.$broadcast('modelSelection');
               }
 
             } else if (stuff.mode !== Mode.MOVE_SELECTION) {
@@ -445,6 +445,7 @@ angular.module('nerdproxyApp')
               return;
             }
             if (Model.getModelIdFromElement(e.target) !== undefined) {
+              scope.$broadcast('modelSelection');
               return;
             }
 
@@ -510,7 +511,7 @@ angular.module('nerdproxyApp')
               return model.id;
             });
 
-            scope.$broadcast('modelSelection', modelsWithin);
+            scope.$broadcast('modelSelection');
 
             $document.off('mousemove', selectBoxMouseMove);
             $document.off('mouseup', selectBoxMouseUp);

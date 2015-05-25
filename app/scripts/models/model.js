@@ -26,9 +26,15 @@ angular.module('nerdproxyApp')
         this.snap.removeClass('selected');
       },
 
+      setColour: function(colourHex) {
+        this.colour = colourHex;
+        this.snap.attr('fill', colourHex);
+      },
+
       getContextMenuItems: function() {
         return [
-          'move'
+          'move',
+          'colour'
         ]
       }
 

@@ -10,6 +10,7 @@ angular.module('nerdproxyApp')
       this.id = modelData.id;
       this.xCm = modelData.xCm;
       this.yCm = modelData.yCm;
+      this.colour = modelData.colour || 'green';
     }
 
     Inf.prototype = Object.create(Model.prototype);
@@ -24,6 +25,7 @@ angular.module('nerdproxyApp')
         var snap = gameSnap.circle(this.xCm, this.yCm, this.baseRadius);
         snap.addClass('model inf model-id-' + this.id);
         snap.attr('data-model-id', this.id);
+        snap.attr('fill', this.colour);
 
         this.snap = snap;
       },
@@ -84,6 +86,7 @@ angular.module('nerdproxyApp')
           id: this.id,
           xCm: this.xCm,
           yCm: this.yCm,
+          colour: this.colour,
           type: 'inf'
         }
       }

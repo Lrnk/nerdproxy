@@ -20,7 +20,8 @@ angular.module('nerdproxyApp')
           id: this.id,
           xCm: this.xCm,
           yCm: this.yCm,
-          type: 'largeInf'
+          type: 'largeInf',
+          colour: this.colour
         }
       }
     });

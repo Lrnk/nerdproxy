@@ -64,7 +64,9 @@ angular.module('nerdproxyApp')
       Mode: Mode,
 
       sendCurrentMessage: sendCurrentMessage,
-      rollDice: rollDice
+      rollDice: rollDice,
+
+      getSelectedModels: getSelectedModels
     });
 
     function rollDice() {
@@ -171,6 +173,10 @@ angular.module('nerdproxyApp')
         BoardInfo.zoomFactor /= 1.5;
         BoardInfo.zoomFactor = Math.max(BoardInfo.zoomFactor, 1);
       }
+    }
+
+    function getSelectedModels() {
+      return _.filter(stuff.models, function(model) {return _.contains(stuff.selectedModelIds, model.id)});
     }
 
 
