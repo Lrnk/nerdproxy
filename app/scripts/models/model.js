@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nerdproxyApp')
-  .factory('Model', function (Ref) {
+  .factory('Model', function (Ref, $timeout) {
 
     function Model(modelData) {
       if (this.constructor === Model) {
@@ -9,6 +9,28 @@ angular.module('nerdproxyApp')
       }
 
       this.firebaseRef = Ref.child('game1/models/' + modelData.id);
+
+      this.firebaseRef.child('colour').on("value", function (snapshot) {
+        this.colour = snapshot.val();
+
+        $timeout(function () {
+          this.snap.attr('fill', snapshot.val());
+        }.bind(this));
+
+      }.bind(this));
+
+      this.firebaseRef.on("child_changed", function (snapshot) {
+
+        if (snapshot.key() === 'xCm' || snapshot.key() === 'yCm') {
+
+          var property = snapshot.key();
+          this[property] = snapshot.val();
+
+          this.setPos(this.xCm, this.yCm);
+        }
+
+      }.bind(this));
+
     }
 
     Model.prototype = {
@@ -27,19 +49,13 @@ angular.module('nerdproxyApp')
         this.snap.removeClass('selected');
       },
 
-      setColourLocal: function(colourHex) {
-        this.colour = colourHex;
-        this.snap.attr('fill', colourHex);
-      },
-
-      setColourRemote: function(colourHex) {
-        this.setColourLocal(colourHex);
+      setColour: function (colourHex) {
         this.firebaseRef.update({
           colour: colourHex
         });
       },
 
-      getContextMenuItems: function() {
+      getContextMenuItems: function () {
         return [
           'move',
           'colour'

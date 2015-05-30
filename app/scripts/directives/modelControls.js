@@ -39,7 +39,7 @@ angular.module('nerdproxyApp')
           ],
           change: function (colour) {
             _.each(scope.getSelectedModels(), function (model) {
-              model.setColourRemote(colour.toHexString());
+              model.setColour(colour.toHexString());
             });
           }
         });

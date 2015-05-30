@@ -26,24 +26,15 @@ angular.module('nerdproxyApp')
 
       this.snap = snap;
 
+      this.firebaseRef.child('rotation').on("value", function (snapshot) {
+        this.setRotation(snapshot.val());
+      }.bind(this));
 
-      this.firebaseRef.on("child_changed", function (snapshot) {
-
-        var property = snapshot.key();
-        this[property] = snapshot.val();
-
-        if(property === 'colour') {
-          this.setColourLocal(this.colour);
-        }
-
-        if(property === 'rotation') {
-          this.setRotation(this.rotation);
-        }
-
-        if(property === 'xCm' || property === 'yCm') {
-          this.setPos(this.xCm, this.yCm);
-        }
-
+      // overwrite colour value event
+      this.firebaseRef.child('colour').off("value");
+      this.firebaseRef.child('colour').on("value", function (snapshot) {
+        this.colour = snapshot.val();
+        this.snap.select('rect').attr('fill', snapshot.val());
       }.bind(this));
 
     }
@@ -118,16 +109,14 @@ angular.module('nerdproxyApp')
       endMove: function () {
 
         if(this.moveInProgress.hasMoved) {
-          this.setPos(this.moveInProgress.lastXCm, this.moveInProgress.lastYCm);
+          this.firebaseRef.update({
+            xCm: this.moveInProgress.lastXCm,
+            yCm: this.moveInProgress.lastYCm
+          });
         }
 
         this.moveInProgress.ghostSnap.remove();
         this.moveInProgress = undefined;
-
-        this.firebaseRef.update({
-          xCm: this.xCm,
-          yCm: this.yCm
-        });
       },
 
       startRotation: function () {
@@ -152,24 +141,18 @@ angular.module('nerdproxyApp')
         this.rotationInProgress.ghostSnap.remove();
 
         if(this.rotationInProgress.hasRotated) {
-          this.setRotation(this.rotationInProgress.newRotation);
+          this.firebaseRef.update({
+            rotation: this.rotationInProgress.newRotation
+          });
         }
-        this.rotationInProgress = undefined;
 
-        this.firebaseRef.update({
-          rotation: this.rotation
-        });
+        this.rotationInProgress = undefined;
       },
 
       getContextMenuItems: function() {
         return Model.prototype.getContextMenuItems.call(this).concat([
           'rotate'
         ]);
-      },
-
-      setColourLocal: function(colourHex) {
-        this.colour = colourHex;
-        this.snap.select('rect').attr('fill', colourHex);
       },
 
       getSyncData: function () {

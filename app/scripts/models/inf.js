@@ -19,21 +19,6 @@ angular.module('nerdproxyApp')
 
       this.snap = snap;
 
-      this.firebaseRef.on("child_changed", function (snapshot) {
-
-        var property = snapshot.key();
-        this[property] = snapshot.val();
-
-        if(property === 'colour') {
-          this.setColourLocal(this.colour);
-        }
-
-        if(property === 'xCm' || property === 'yCm') {
-          this.setPos(this.xCm, this.yCm);
-        }
-
-      }.bind(this));
-
     }
 
     Inf.prototype = Object.create(Model.prototype);
@@ -89,15 +74,12 @@ angular.module('nerdproxyApp')
 
       endMove: function () {
         var ghostSnap = this.moveInProgress.ghostSnap;
-        this.setPos(ghostSnap.attr('cx'), ghostSnap.attr('cy'));
-        ghostSnap.remove();
-
-        this.moveInProgress = undefined;
-
         this.firebaseRef.update({
-          xCm: this.xCm,
-          yCm: this.yCm
+          xCm: ghostSnap.attr('cx'),
+          yCm: ghostSnap.attr('cy')
         });
+        ghostSnap.remove();
+        this.moveInProgress = undefined;
       },
 
       getSyncData: function () {
