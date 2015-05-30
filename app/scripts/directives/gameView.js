@@ -148,20 +148,33 @@ angular.module('nerdproxyApp')
 
           function modelMouseDown(e) {
 
-            // if we're in default mode, only move if we're clicking on a model
+            if (!isElementOnBoard(e.target)) {
+              return;
+            }
+
+            // if we're in default mode, only move if we're clicking on a model, else unselect
             // if we're in move_select mode, accept the selection as is and move it
             // else do nothing
 
-            var modelId = Model.getModelIdFromElement(e.target);
-            if (stuff.mode === Mode.DEFAULT && modelId !== undefined) {
+            if (stuff.mode === Mode.DEFAULT) {
+              var modelId = Model.getModelIdFromElement(e.target);
+              if (modelId !== undefined) {
 
-              var targetIsAlreadySelected = stuff.selectedModelIds && _.contains(stuff.selectedModelIds, modelId);
-              if (!targetIsAlreadySelected) {
-                stuff.selectedModelIds = [modelId];
-                stuff.models[modelId].select();
-                scope.$broadcast('modelSelection');
+                var targetIsAlreadySelected = stuff.selectedModelIds && _.contains(stuff.selectedModelIds, modelId);
+                if (!targetIsAlreadySelected) {
+                  _.each(stuff.selectedModelIds, function (modelId) {
+                    stuff.models[modelId].deselect();
+                  });
+                  stuff.selectedModelIds = [modelId];
+                  stuff.models[modelId].select();
+                  scope.$broadcast('modelSelection');
+                }
+              } else {
+                _.each(stuff.selectedModelIds, function (modelId) {
+                  stuff.models[modelId].deselect();
+                });
+                stuff.selectedModelIds = [];
               }
-
             } else if (stuff.mode !== Mode.MOVE_SELECTION) {
               return;
             }
@@ -323,7 +336,7 @@ angular.module('nerdproxyApp')
             if (stuff.mode !== Mode.RANGE) {
               return;
             }
-            if (!element.has($(e.target)).length) {
+            if (!isElementOnBoard(e.target)) {
               return;
             }
 
@@ -422,7 +435,7 @@ angular.module('nerdproxyApp')
             if (stuff.mode !== Mode.DEFAULT) {
               return;
             }
-            if (!element.has($(e.target)).length) {
+            if (!isElementOnBoard(e.target)) {
               return;
             }
             if (Model.getModelIdFromElement(e.target) !== undefined) {
@@ -506,6 +519,10 @@ angular.module('nerdproxyApp')
 
         })();
 
+
+        function isElementOnBoard(el) {
+          return !!element.has($(el)).length;
+        }
       }
     };
   });
