@@ -259,8 +259,6 @@ angular.module('nerdproxyApp')
             $document.off('touchend', modelMouseUp);
             $document.off('touchcancel', modelMouseUp);
 
-            scope.saveState();
-
             scope.$apply();
           }
 
@@ -340,8 +338,6 @@ angular.module('nerdproxyApp')
             $document.off('touchmove', modelRotateMouseMove);
             $document.off('touchend', modelRotateMouseUp);
             $document.off('touchcancel', modelRotateMouseUp);
-
-            scope.saveState();
 
             scope.$apply();
           }
@@ -427,7 +423,7 @@ angular.module('nerdproxyApp')
             $document.off('touchcancel', rangeCheckMouseUp);
 
             scope.state.range = range;
-            scope.saveState();
+            //scope.saveState();
 
             scope.$apply();
           }

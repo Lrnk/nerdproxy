@@ -6,9 +6,8 @@ angular.module('nerdproxyApp')
       restrict: 'E',
       templateUrl: 'views/chatBox.html',
       replace: true,
+      controller: 'ChatBoxCtrl',
       link: function postLink() {
-
-
       }
     };
   });

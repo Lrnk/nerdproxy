@@ -15,11 +15,6 @@ angular.module('nerdproxyApp')
     MOVE_SELECTION: 3,
     ROTATE: 4
   })
-  .filter('chatDate', function () {
-    return function (time) {
-      return new moment(time).calendar();
-    };
-  })
   .controller('GameCtrl', function ($scope, Ref, Mode, BoardInfo) {
 
     var stuff = {
@@ -36,10 +31,6 @@ angular.module('nerdproxyApp')
 
       mode: Mode.DEFAULT,
 
-      currentMessage: '',
-      numDice: 1,
-      diceValue: 6,
-
       models: []
 
     };
@@ -48,8 +39,6 @@ angular.module('nerdproxyApp')
 
       stuff: stuff,
       BoardInfo: BoardInfo,
-
-      saveState: saveState,
 
       toggleMoveMode: toggleMoveMode,
       toggleRangeCheckMode: toggleRangeCheckMode,
@@ -63,51 +52,8 @@ angular.module('nerdproxyApp')
 
       Mode: Mode,
 
-      sendCurrentMessage: sendCurrentMessage,
-      rollDice: rollDice,
-
       getSelectedModels: getSelectedModels
     });
-
-    function rollDice() {
-
-      if(stuff.numDice === null || stuff.diceValue === null) {
-        return;
-      }
-
-      var results = [];
-      for (var i = 0; i < stuff.numDice; i++) {
-        results.push(Math.floor((Math.random() * stuff.diceValue) + 1));
-      }
-
-      if (!$scope.state.chatter) {
-        $scope.state.chatter = [];
-      }
-      $scope.state.chatter.push({
-        type: 'roll',
-        numDice: stuff.numDice,
-        diceValue: stuff.diceValue,
-        results: results,
-        time: new Date()
-      });
-      saveState();
-    }
-
-    function sendCurrentMessage() {
-      if (stuff.currentMessage.trim().length) {
-
-        if (!$scope.state.chatter) {
-          $scope.state.chatter = [];
-        }
-
-        $scope.state.chatter.push({
-          body: stuff.currentMessage,
-          time: new Date()
-        });
-        stuff.currentMessage = '';
-        saveState();
-      }
-    }
 
     function getXSpaceForMenus() {
 
@@ -177,22 +123,6 @@ angular.module('nerdproxyApp')
 
     function getSelectedModels() {
       return _.filter(stuff.models, function(model) {return _.contains(stuff.selectedModelIds, model.id)});
-    }
-
-
-    //data yo
-
-    //Ref.on('value', function (snapshot) {
-    //  $scope.state = snapshot.val()['game1'];
-    //  $scope.$broadcast('refreshState');
-    //});
-    //
-    //// todo make stuff so it only sends what's changed
-    function saveState() {
-    //
-    //  $scope.state.models = _.map($scope.stuff.models, function(model) {return model.getSyncData();});
-    //
-    //  Ref.child('game1').set(angular.fromJson(angular.toJson($scope.state)));
     }
 
   });

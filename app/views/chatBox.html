@@ -2,14 +2,14 @@
 
   <div class="chatter">
 
-    <ul ng-show="state.chatter.length">
-      <li class="chat-item" ng-repeat="chatItem in state.chatter | reverse">
+    <ul ng-show="chats.length">
+      <li class="chat-item" ng-repeat="chat in chats | reverse">
 
-        <span ng-if="!chatItem.type"><span class="chat-date">{{chatItem.time | chatDate}}</span> {{chatItem.body}}</span>
+        <span ng-if="!chat.type"><span class="chat-date">{{chat.time | chatDate}}</span> {{chat.body}}</span>
 
-        <span ng-if="chatItem.type === 'roll'"><span class="chat-date">{{chatItem.time | chatDate}}</span> Rolled {{chatItem.numDice}} D{{chatItem.diceValue}}:
+        <span ng-if="chat.type === 'roll'"><span class="chat-date">{{chat.time | chatDate}}</span> Rolled {{chat.numDice}} D{{chat.diceValue}}:
           <span class="dice-results">
-            <span ng-repeat="result in chatItem.results track by $index">&nbsp;{{result}}</span>
+            <span ng-repeat="result in chat.results track by $index">&nbsp;{{result}}</span>
           </span>
         </span>
 
@@ -19,15 +19,15 @@
   </div>
 
   <form ng-submit="sendCurrentMessage()">
-    <input type="text" ng-model="stuff.currentMessage"/>
+    <input type="text" ng-model="currentMessage"/>
     <input type="submit" value="send" />
   </form>
 
   <form ng-submit="rollDice()">
     <span>Dice: </span>
-    <input class="num-dice" type="number" ng-model="stuff.numDice"/>
+    <input class="num-dice" type="number" ng-model="numDice"/>
     <span>x D</span>
-    <input class="dice-value" type="number" ng-model="stuff.diceValue"/>
+    <input class="dice-value" type="number" ng-model="diceValue"/>
     <input type="submit" value="roll" />
   </form>
 
