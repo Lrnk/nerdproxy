@@ -12,6 +12,40 @@ angular.module('nerdproxyApp')
       this.yCm = Number(modelData.yCm);
       this.colour = modelData.colour || 'green';
       this.rotation = Number(modelData.rotation);
+
+
+      var snap = BoardInfo.snap.group();
+
+      snap.attr('transform', 'translate(' + this.xCm + ', ' + this.yCm + ')');
+      snap.addClass('model tank');
+      snap.attr('data-model-id', this.id);
+
+      var rect = snap.rect( -(this.w / 2), -(this.h / 2), this.w, this.h, 0.5);
+      rect.attr('transform', 'rotate(' + this.rotation + ')');
+      rect.attr('fill', this.colour);
+
+      this.snap = snap;
+
+
+      this.firebaseRef.on("child_changed", function (snapshot) {
+
+        var property = snapshot.key();
+        this[property] = snapshot.val();
+
+        if(property === 'colour') {
+          this.setColourLocal(this.colour);
+        }
+
+        if(property === 'rotation') {
+          this.setRotation(this.rotation);
+        }
+
+        if(property === 'xCm' || property === 'yCm') {
+          this.setPos(this.xCm, this.yCm);
+        }
+
+      }.bind(this));
+
     }
 
     Tank.prototype = Object.create(Model.prototype);
@@ -23,21 +57,6 @@ angular.module('nerdproxyApp')
       w: 8,
       h: 12,
 
-      createSnap: function (gameSnap) {
-
-        var snap = gameSnap.group();
-
-        snap.attr('transform', 'translate(' + this.xCm + ', ' + this.yCm + ')');
-        snap.addClass('model tank');
-        snap.attr('data-model-id', this.id);
-
-        var rect = snap.rect( -(this.w / 2), -(this.h / 2), this.w, this.h, 0.5);
-        rect.attr('transform', 'rotate(' + this.rotation + ')');
-        rect.attr('fill', this.colour);
-
-        this.snap = snap;
-      },
-
       setPos: function (xCm, yCm) {
 
         this.xCm = xCm;
@@ -47,6 +66,11 @@ angular.module('nerdproxyApp')
         this.snap.attr('y', yCm);
         this.snap.attr('transform', 'translate(' + xCm + ' ' + yCm + ')');
 
+      },
+
+      setRotation: function (rotation) {
+        this.rotation = rotation;
+        this.snap.select('rect').attr('transform', 'rotate(' + rotation + ')');
       },
 
       startMove: function (xPx, yPx) {
@@ -99,6 +123,11 @@ angular.module('nerdproxyApp')
 
         this.moveInProgress.ghostSnap.remove();
         this.moveInProgress = undefined;
+
+        this.firebaseRef.update({
+          xCm: this.xCm,
+          yCm: this.yCm
+        });
       },
 
       startRotation: function () {
@@ -123,11 +152,13 @@ angular.module('nerdproxyApp')
         this.rotationInProgress.ghostSnap.remove();
 
         if(this.rotationInProgress.hasRotated) {
-          this.rotation = this.rotationInProgress.newRotation;
-          this.snap.select('rect').attr('transform', 'rotate(' + this.rotation + ')');
+          this.setRotation(this.rotationInProgress.newRotation);
         }
-
         this.rotationInProgress = undefined;
+
+        this.firebaseRef.update({
+          rotation: this.rotation
+        });
       },
 
       getContextMenuItems: function() {

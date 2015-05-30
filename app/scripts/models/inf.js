@@ -92,12 +92,12 @@ angular.module('nerdproxyApp')
         this.setPos(ghostSnap.attr('cx'), ghostSnap.attr('cy'));
         ghostSnap.remove();
 
+        this.moveInProgress = undefined;
+
         this.firebaseRef.update({
           xCm: this.xCm,
           yCm: this.yCm
         });
-
-        this.moveInProgress = undefined;
       },
 
       getSyncData: function () {
