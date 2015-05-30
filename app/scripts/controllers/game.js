@@ -182,17 +182,17 @@ angular.module('nerdproxyApp')
 
     //data yo
 
-    Ref.on('value', function (snapshot) {
-      $scope.state = snapshot.val()['game1'];
-      $scope.$broadcast('refreshState');
-    });
-
-    // todo make stuff so it only sends what's changed
+    //Ref.on('value', function (snapshot) {
+    //  $scope.state = snapshot.val()['game1'];
+    //  $scope.$broadcast('refreshState');
+    //});
+    //
+    //// todo make stuff so it only sends what's changed
     function saveState() {
-
-      $scope.state.models = _.map($scope.stuff.models, function(model) {return model.getSyncData();});
-
-      Ref.child('game1').set(angular.fromJson(angular.toJson($scope.state)));
+    //
+    //  $scope.state.models = _.map($scope.stuff.models, function(model) {return model.getSyncData();});
+    //
+    //  Ref.child('game1').set(angular.fromJson(angular.toJson($scope.state)));
     }
 
   });

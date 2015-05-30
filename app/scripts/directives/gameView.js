@@ -7,7 +7,7 @@
  * # gameControls
  */
 angular.module('nerdproxyApp')
-  .directive('gameView', function ($document, $timeout, $window, Model, Inf, LargeInf, Tank, Mode, BoardInfo) {
+  .directive('gameView', function ($document, $timeout, $window, Model, Inf, LargeInf, Tank, Mode, BoardInfo, Ref) {
     return {
       restrict: 'E',
       templateUrl: 'views/gameView.html',
@@ -17,13 +17,13 @@ angular.module('nerdproxyApp')
         // init
 
         var stuff = scope.stuff;
-        var gameSnap = Snap('.game-entities');
+        BoardInfo.snap = Snap('.game-entities');
 
 
-        var rangeLineSnap = gameSnap.line(0, 0, 0, 0);
+        var rangeLineSnap = BoardInfo.snap.line(0, 0, 0, 0);
         rangeLineSnap.addClass('range-line');
 
-        var rangeInfoSnap = gameSnap.text(0, 0, '');
+        var rangeInfoSnap = BoardInfo.snap.text(0, 0, '');
         rangeInfoSnap.addClass('range-info-text');
 
         element.find('svg')[0].setAttribute('viewBox', '0 0 ' + BoardInfo.widthCm + ' ' + BoardInfo.heightCm);
@@ -107,46 +107,73 @@ angular.module('nerdproxyApp')
         });
 
 
+        // get models
+        var modelsRef = Ref.child('game1/models');
+        modelsRef.on("child_added", function (snapshot) {
+
+          var modelData = snapshot.val();
+          var model;
+
+          switch (modelData.type) {
+            case 'inf':
+              model = new Inf(modelData);
+              break;
+            case 'largeInf':
+              model = new LargeInf(modelData);
+              break;
+            case 'tank':
+              model = new Tank(modelData);
+              break;
+            default:
+              console.log('Unrecognised model type: ' + modelData.type);
+              return;
+          }
+
+          stuff.models.push(model);
+
+        });
+
+
         scope.$on('refreshState', refreshState);
 
         function refreshState() {
-
-          $timeout(function () {
-
-            stuff.models = [];
-            gameSnap.selectAll('.model').remove();
-            angular.forEach(scope.state.models, function (modelDatum, modelId) {
-
-              var model;
-
-              switch (modelDatum.type) {
-                case 'inf':
-                  model = new Inf(modelDatum);
-                  break;
-                case 'largeInf':
-                  model = new LargeInf(modelDatum);
-                  break;
-                case 'tank':
-                  model = new Tank(modelDatum);
-                  break;
-                default:
-                  console.log('Unrecognised model type: ' + modelDatum.type);
-                  return;
-              }
-
-              model.createSnap(gameSnap);
-              stuff.models.push(model);
-
-              if (_.contains(stuff.selectedModelIds, modelId)) {
-                model.select();
-              }
-
-              if (scope.state.range) {
-                drawRangeLine(scope.state.range);
-              }
-
-            })
-          });
+          //
+          //$timeout(function () {
+          //
+          //  stuff.models = [];
+          //  BoardInfo.snap.selectAll('.model').remove();
+          //  angular.forEach(scope.state.models, function (modelDatum, modelId) {
+          //
+          //    var model;
+          //
+          //    switch (modelDatum.type) {
+          //      case 'inf':
+          //        model = new Inf(modelDatum);
+          //        break;
+          //      case 'largeInf':
+          //        model = new LargeInf(modelDatum);
+          //        break;
+          //      case 'tank':
+          //        model = new Tank(modelDatum);
+          //        break;
+          //      default:
+          //        console.log('Unrecognised model type: ' + modelDatum.type);
+          //        return;
+          //    }
+          //
+          //    model.createSnap(BoardInfo.snap);
+          //    stuff.models.push(model);
+          //
+          //    if (_.contains(stuff.selectedModelIds, modelId)) {
+          //      model.select();
+          //    }
+          //
+          //    if (scope.state.range) {
+          //      drawRangeLine(scope.state.range);
+          //    }
+          //
+          //  })
+          //});
         }
 
 
@@ -458,7 +485,7 @@ angular.module('nerdproxyApp')
             startXCm = BoardInfo.pxToCm(pointerPosX - leftOffset);
             startYCm = BoardInfo.pxToCm(pointerPosY - topOffset);
 
-            selectBoxSnap = gameSnap.rect(startXCm, startYCm, 0, 0);
+            selectBoxSnap = BoardInfo.snap.rect(startXCm, startYCm, 0, 0);
             selectBoxSnap.addClass('select-box');
 
             modelsWithin = [];

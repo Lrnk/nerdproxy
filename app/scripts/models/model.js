@@ -1,17 +1,18 @@
 'use strict';
 
 angular.module('nerdproxyApp')
-  .factory('Model', function () {
+  .factory('Model', function (Ref) {
 
-    function Model() {
+    function Model(modelData) {
       if (this.constructor === Model) {
         throw new Error("Tried to instantiate abstract class!");
       }
+
+      this.firebaseRef = Ref.child('game1/models/' + modelData.id);
     }
 
     Model.prototype = {
 
-      createSnap: abstractMethod,
       setPos: abstractMethod,
       startMove: abstractMethod,
       continueMove: abstractMethod,
@@ -26,9 +27,16 @@ angular.module('nerdproxyApp')
         this.snap.removeClass('selected');
       },
 
-      setColour: function(colourHex) {
+      setColourLocal: function(colourHex) {
         this.colour = colourHex;
         this.snap.attr('fill', colourHex);
+      },
+
+      setColourRemote: function(colourHex) {
+        this.setColourLocal(colourHex);
+        this.firebaseRef.update({
+          colour: colourHex
+        });
       },
 
       getContextMenuItems: function() {

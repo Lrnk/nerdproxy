@@ -5,7 +5,7 @@ angular.module('nerdproxyApp')
 
     function Tank(modelData) {
 
-      Model.call(this);
+      Model.call(this, modelData);
 
       this.id = Number(modelData.id);
       this.xCm = Number(modelData.xCm);
@@ -136,7 +136,7 @@ angular.module('nerdproxyApp')
         ]);
       },
 
-      setColour: function(colourHex) {
+      setColourLocal: function(colourHex) {
         this.colour = colourHex;
         this.snap.select('rect').attr('fill', colourHex);
       },

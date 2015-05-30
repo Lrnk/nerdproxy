@@ -5,12 +5,35 @@ angular.module('nerdproxyApp')
 
     function Inf(modelData) {
 
-      Model.call(this);
+      Model.call(this, modelData);
 
       this.id = modelData.id;
       this.xCm = modelData.xCm;
       this.yCm = modelData.yCm;
       this.colour = modelData.colour || 'green';
+
+      var snap = BoardInfo.snap.circle(this.xCm, this.yCm, this.baseRadius);
+      snap.addClass('model inf model-id-' + this.id);
+      snap.attr('data-model-id', this.id);
+      snap.attr('fill', this.colour);
+
+      this.snap = snap;
+
+      this.firebaseRef.on("child_changed", function (snapshot) {
+
+        var property = snapshot.key();
+        this[property] = snapshot.val();
+
+        if(property === 'colour') {
+          this.setColourLocal(this.colour);
+        }
+
+        if(property === 'xCm' || property === 'yCm') {
+          this.setPos(this.xCm, this.yCm);
+        }
+
+      }.bind(this));
+
     }
 
     Inf.prototype = Object.create(Model.prototype);
@@ -20,15 +43,6 @@ angular.module('nerdproxyApp')
       constructor: Inf,
 
       baseRadius: 1.25,
-
-      createSnap: function(gameSnap){
-        var snap = gameSnap.circle(this.xCm, this.yCm, this.baseRadius);
-        snap.addClass('model inf model-id-' + this.id);
-        snap.attr('data-model-id', this.id);
-        snap.attr('fill', this.colour);
-
-        this.snap = snap;
-      },
 
       setPos: function (xCm, yCm) {
 
@@ -78,10 +92,15 @@ angular.module('nerdproxyApp')
         this.setPos(ghostSnap.attr('cx'), ghostSnap.attr('cy'));
         ghostSnap.remove();
 
+        this.firebaseRef.update({
+          xCm: this.xCm,
+          yCm: this.yCm
+        });
+
         this.moveInProgress = undefined;
       },
 
-      getSyncData: function() {
+      getSyncData: function () {
         return {
           id: this.id,
           xCm: this.xCm,

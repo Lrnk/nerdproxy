@@ -14,6 +14,7 @@ angular.module('nerdproxyApp').
       heightCm: 121.92,
 
       zoomFactor: 1,
+      snap: undefined, // set by gameview directive
 
       pxToCm: pxToCm
 
