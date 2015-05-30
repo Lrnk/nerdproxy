@@ -133,50 +133,6 @@ angular.module('nerdproxyApp')
 
         });
 
-
-        scope.$on('refreshState', refreshState);
-
-        function refreshState() {
-          //
-          //$timeout(function () {
-          //
-          //  stuff.models = [];
-          //  BoardInfo.snap.selectAll('.model').remove();
-          //  angular.forEach(scope.state.models, function (modelDatum, modelId) {
-          //
-          //    var model;
-          //
-          //    switch (modelDatum.type) {
-          //      case 'inf':
-          //        model = new Inf(modelDatum);
-          //        break;
-          //      case 'largeInf':
-          //        model = new LargeInf(modelDatum);
-          //        break;
-          //      case 'tank':
-          //        model = new Tank(modelDatum);
-          //        break;
-          //      default:
-          //        console.log('Unrecognised model type: ' + modelDatum.type);
-          //        return;
-          //    }
-          //
-          //    model.createSnap(BoardInfo.snap);
-          //    stuff.models.push(model);
-          //
-          //    if (_.contains(stuff.selectedModelIds, modelId)) {
-          //      model.select();
-          //    }
-          //
-          //    if (scope.state.range) {
-          //      drawRangeLine(scope.state.range);
-          //    }
-          //
-          //  })
-          //});
-        }
-
-
         (function initModelMovingStuff() {
 
           var startPageXPx;
@@ -347,6 +303,7 @@ angular.module('nerdproxyApp')
 
         (function initRangeCheckingStuff() {
 
+          var firebaseRef = Ref.child('game1/range');
           var startPageXPx;
           var startPageYPx;
           var leftOffset;
@@ -356,6 +313,10 @@ angular.module('nerdproxyApp')
 
           $document.on('mousedown', rangeCheckMouseDown);
           $document.on('touchstart', rangeCheckMouseDown);
+
+          firebaseRef.on('value', function (snapshot) {
+            drawRangeLine(snapshot.val());
+          });
 
           function rangeCheckMouseDown(e) {
 
@@ -422,10 +383,7 @@ angular.module('nerdproxyApp')
             $document.off('touchend', rangeCheckMouseUp);
             $document.off('touchcancel', rangeCheckMouseUp);
 
-            scope.state.range = range;
-            //scope.saveState();
-
-            scope.$apply();
+            firebaseRef.set(range);
           }
 
 
