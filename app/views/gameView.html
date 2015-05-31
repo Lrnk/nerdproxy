@@ -4,23 +4,6 @@
           height: (BoardInfo.heightPx) + 'px'
          }"
   >
-
-  <div
-    class="model-maker"
-    ng-class="{'not-showing': stuff.mode !== Mode.ADD_MODELS}"
-    >
-    <div class="model-picker">
-      <select>
-        <option name="inf">Inf</option>
-        <option name="largeInf">Large inf</option>
-        <option name="tank">Tank</option>
-      </select>
-    </div>
-    <div class="spawning-pit">
-      <div class="potential-model"></div>
-    </div>
-  </div>
-
   <div class="game-view-scroller"
        ng-style="{
           width: (BoardInfo.zoomFactor * BoardInfo.widthPx) + 'px',
@@ -45,4 +28,21 @@
 
     </svg>
   </div>
+
+  <div
+    class="model-maker"
+    ng-class="{'not-showing': stuff.mode !== Mode.ADD_MODELS}"
+    >
+    <div class="model-picker">
+      <select>
+        <option name="inf">Inf</option>
+        <option name="largeInf">Large inf</option>
+        <option name="tank">Tank</option>
+      </select>
+    </div>
+    <div class="spawning-pit">
+      <div class="potential-model"></div>
+    </div>
+  </div>
+
 </div>
