@@ -16,7 +16,7 @@ angular.module('nerdproxyApp')
     ROTATE: 4,
     ADD_MODELS: 5
   })
-  .controller('GameCtrl', function ($scope, Ref, Mode, BoardInfo) {
+  .controller('GameCtrl', function ($scope, $document, $timeout, Ref, Mode, BoardInfo) {
 
     var stuff = {
 
@@ -113,8 +113,22 @@ angular.module('nerdproxyApp')
     function toggleAddModelsMode() {
       if (stuff.mode === Mode.ADD_MODELS) {
         stuff.mode = Mode.DEFAULT;
+        $document.off('mousedown', cancelAddModelMode);
       } else {
         stuff.mode = Mode.ADD_MODELS;
+        $document.on('mousedown', cancelAddModelMode);
+
+      }
+
+      function cancelAddModelMode(e) {
+        if(!$('.model-maker').has($(e.target)).length) {
+
+          $timeout(function() {
+            stuff.mode = Mode.DEFAULT;
+            $document.off('mousedown', cancelAddModelMode);
+            $document.trigger(e);
+          });
+        }
       }
     }
 
