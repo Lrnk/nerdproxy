@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nerdproxyApp')
-  .factory('Model', function (Ref, $timeout) {
+  .factory('Model', function ($rootScope, Ref, $timeout) {
 
     function Model(modelId, modelData) {
       if (this.constructor === Model) {
@@ -31,6 +31,17 @@ angular.module('nerdproxyApp')
 
       }.bind(this));
 
+      // handle removal
+      this.firebaseRef.on("value", function (snapshot) {
+        if(!snapshot.val()) {
+
+          this.snap.remove();
+
+          $rootScope.$broadcast('model-removed', this.id);
+
+        }
+      }.bind(this));
+
     }
 
     Model.prototype = {
@@ -57,8 +68,13 @@ angular.module('nerdproxyApp')
       getContextMenuItems: function () {
         return [
           'move',
-          'colour'
+          'colour',
+          'remove'
         ]
+      },
+
+      removeFromGame: function() {
+        this.firebaseRef.set(null);
       }
 
     };

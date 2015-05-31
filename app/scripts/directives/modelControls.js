@@ -19,7 +19,7 @@ angular.module('nerdproxyApp')
             $scope.menuItems = selectedModels[0].getContextMenuItems();
 
           } else if (selectedModels && selectedModels.length > 1) {
-            $scope.menuItems = ['moveSelection']
+            $scope.menuItems = ['moveSelection', 'removeSelection']
 
           } else {
             $scope.menuItems = [];

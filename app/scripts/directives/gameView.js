@@ -7,7 +7,7 @@
  * # gameControls
  */
 angular.module('nerdproxyApp')
-  .directive('gameView', function ($document, $timeout, $window, Model, Inf, LargeInf, Tank, Mode, BoardInfo, Ref) {
+  .directive('gameView', function ($rootScope, $document, $timeout, $window, Model, Inf, LargeInf, Tank, Mode, BoardInfo, Ref) {
     return {
       restrict: 'E',
       templateUrl: 'views/gameView.html',
@@ -132,6 +132,16 @@ angular.module('nerdproxyApp')
 
           stuff.models[modelId] = model;
 
+        });
+
+        //handle removing models
+        $rootScope.$on('model-removed', function(e, modelId) {
+          delete stuff.models[modelId];
+
+          var selectedModelIndex = stuff.selectedModelIds.indexOf(modelId);
+          if (~selectedModelIndex) {
+            stuff.selectedModelIds.splice(selectedModelIndex, 1);
+          }
         });
 
         (function initModelMovingStuff() {

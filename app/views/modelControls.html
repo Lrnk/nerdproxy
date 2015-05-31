@@ -29,4 +29,20 @@
 
   <input type="text" class="colour-picker"/>
 
+  <div
+    class="button"
+    ng-if="_.contains(menuItems, 'remove')"
+    ng-click="removeSelectedModels()"
+    >
+    Remove
+  </div>
+
+  <div
+    class="button"
+    ng-if="_.contains(menuItems, 'removeSelection')"
+    ng-click="removeSelectedModels()"
+    >
+    Remove models
+  </div>
+
 </div>

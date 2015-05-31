@@ -54,7 +54,8 @@ angular.module('nerdproxyApp')
 
       Mode: Mode,
 
-      getSelectedModels: getSelectedModels
+      getSelectedModels: getSelectedModels,
+      removeSelectedModels: removeSelectedModels
     });
 
     function getXSpaceForMenus() {
@@ -133,6 +134,17 @@ angular.module('nerdproxyApp')
 
     function getSelectedModels() {
       return _.filter(stuff.models, function(model) {return _.contains(stuff.selectedModelIds, model.id)});
+    }
+
+    function removeSelectedModels() {
+      _.each(
+        _.filter(stuff.models,
+          function (model) {
+            return _.contains(stuff.selectedModelIds, model.id)
+          }),
+        function (selectedModel) {
+          selectedModel.removeFromGame();
+        });
     }
 
   });
