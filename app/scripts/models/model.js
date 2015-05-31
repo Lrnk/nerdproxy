@@ -71,7 +71,7 @@ angular.module('nerdproxyApp')
           return undefined;
 
         } else if (element.className && element.className.baseVal && ~element.className.baseVal.indexOf('model ')) {
-          return $(element).data('modelId');
+          return $(element).data('modelId').toString();
 
         } else {
           return getModelIdFromElement(element.parentElement);

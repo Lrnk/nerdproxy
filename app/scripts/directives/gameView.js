@@ -170,11 +170,13 @@ angular.module('nerdproxyApp')
                   stuff.models[modelId].select();
                   scope.$broadcast('modelSelection');
                 }
+
               } else {
                 _.each(stuff.selectedModelIds, function (modelId) {
                   stuff.models[modelId].deselect();
                 });
                 stuff.selectedModelIds = [];
+                return;
               }
             } else if (stuff.mode !== Mode.MOVE_SELECTION) {
               return;
