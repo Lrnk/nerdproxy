@@ -27,6 +27,42 @@
   overflow: hidden;
 }
 
+.model-maker {
+  position: absolute;
+  height: 35px;
+  width: 120px;
+  top: 0;
+  left: 0;
+  outline: 1px solid gold;
+  z-index: 10;
+  display: table;
+}
+
+.model-maker .model-picker {
+  display: table-cell;
+  vertical-align: middle;
+  height: 100%;
+  width: 80%;
+  padding: 0 10px;
+}
+
+.model-maker .model-picker select {
+  width: 100%;
+}
+
+.model-maker .spawning-pit {
+  display: table-cell;
+  vertical-align: middle;
+  height: 100%;
+  width: 20%;
+}
+
+.model-maker .spawning-pit .potential-model{
+  height: 20px;
+  width: 20px;
+  background: red;
+}
+
 .map {
   position: absolute;
   top: 0;

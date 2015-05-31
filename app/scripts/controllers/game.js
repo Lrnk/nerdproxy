@@ -13,7 +13,8 @@ angular.module('nerdproxyApp')
     MOVE_VIEW: 1,
     RANGE: 2,
     MOVE_SELECTION: 3,
-    ROTATE: 4
+    ROTATE: 4,
+    ADD_MODELS: 5
   })
   .controller('GameCtrl', function ($scope, Ref, Mode, BoardInfo) {
 
@@ -44,6 +45,7 @@ angular.module('nerdproxyApp')
       toggleRangeCheckMode: toggleRangeCheckMode,
       toggleMoveSelectionMode: toggleMoveSelectionMode,
       toggleRotateMode: toggleRotateMode,
+      toggleAddModelsMode: toggleAddModelsMode,
       zoomIn: zoomIn,
       zoomOut: zoomOut,
 
@@ -104,6 +106,14 @@ angular.module('nerdproxyApp')
         stuff.mode = Mode.DEFAULT;
       } else {
         stuff.mode = Mode.RANGE;
+      }
+    }
+
+    function toggleAddModelsMode() {
+      if (stuff.mode === Mode.ADD_MODELS) {
+        stuff.mode = Mode.DEFAULT;
+      } else {
+        stuff.mode = Mode.ADD_MODELS;
       }
     }
 
