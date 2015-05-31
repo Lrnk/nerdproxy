@@ -19,6 +19,7 @@ angular.module('nerdproxyApp')
         var stuff = scope.stuff;
         BoardInfo.snap = Snap('.game-entities');
 
+        var modelsRef = Ref.child('game1/models');
 
         var rangeLineSnap = BoardInfo.snap.line(0, 0, 0, 0);
         rangeLineSnap.addClass('range-line');
@@ -108,28 +109,28 @@ angular.module('nerdproxyApp')
 
 
         // get models
-        var modelsRef = Ref.child('game1/models');
         modelsRef.on("child_added", function (snapshot) {
 
+          var modelId = snapshot.key();
           var modelData = snapshot.val();
           var model;
 
           switch (modelData.type) {
             case 'inf':
-              model = new Inf(modelData);
+              model = new Inf(modelId, modelData);
               break;
             case 'largeInf':
-              model = new LargeInf(modelData);
+              model = new LargeInf(modelId, modelData);
               break;
             case 'tank':
-              model = new Tank(modelData);
+              model = new Tank(modelId, modelData);
               break;
             default:
               console.log('Unrecognised model type: ' + modelData.type);
               return;
           }
 
-          stuff.models.push(model);
+          stuff.models[modelId] = model;
 
         });
 
@@ -486,10 +487,10 @@ angular.module('nerdproxyApp')
               'height': h
             });
 
-            modelsWithin = [];
+            modelsWithin = {};
             angular.forEach(stuff.models, function (model) {
               if (model.xCm > x && model.xCm < (x + w) && model.yCm > y && model.yCm < (y + h)) {
-                modelsWithin.push(model);
+                modelsWithin[model.id] = model;
                 model.select();
               } else {
                 model.deselect();
@@ -515,6 +516,87 @@ angular.module('nerdproxyApp')
             $document.off('touchcancel', selectBoxMouseUp);
 
             scope.$apply();
+          }
+
+        })();
+
+
+        (function initAddModelStuff() {
+
+          var spawningPit = $('.spawning-pit');
+          var modelType;
+
+          $document.on('mousedown', addModelMouseDown);
+          $document.on('touchstart', addModelMouseDown);
+
+          function addModelMouseDown(e) {
+
+            if (stuff.mode !== Mode.ADD_MODELS) {
+              return;
+            }
+            if (!spawningPit.has($(e.target)).length) {
+              return;
+            }
+
+            modelType = $('.model-picker').find(":selected").attr('name');
+
+            $document.on('mousemove', addModelMouseMove);
+            $document.on('mouseup', addModelMouseUp);
+
+            $document.on('touchmove', addModelMouseMove);
+            $document.on('touchend', addModelMouseUp);
+            $document.on('touchcancel', addModelMouseUp);
+
+          }
+
+          function addModelMouseMove(e) {
+
+            //var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
+            //var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
+            //
+            //var posChangeXCm = startXCm - BoardInfo.pxToCm(pointerPosX - leftOffset);
+            //var posChangeYCm = startYCm - BoardInfo.pxToCm(pointerPosY - topOffset);
+            //
+            //var x = Math.min(startXCm, startXCm - posChangeXCm);
+            //var y = Math.min(startYCm, startYCm - posChangeYCm);
+            //var w = Math.abs(posChangeXCm);
+            //var h = Math.abs(posChangeYCm);
+            //
+            //selectBoxSnap.attr({
+            //  'x': x,
+            //  'y': y,
+            //  'width': w,
+            //  'height': h
+            //});
+            //
+            //modelsWithin = [];
+            //angular.forEach(stuff.models, function (model) {
+            //  if (model.xCm > x && model.xCm < (x + w) && model.yCm > y && model.yCm < (y + h)) {
+            //    modelsWithin.push(model);
+            //    model.select();
+            //  } else {
+            //    model.deselect();
+            //  }
+            //});
+          }
+
+          function addModelMouseUp() {
+
+            var newModelRef = modelsRef.push({
+              xCm: 100,
+              yCm: 100,
+              type: modelType
+            });
+            newModelRef.update({
+              id: newModelRef.key()
+            });
+
+            $document.off('mousemove', addModelMouseMove);
+            $document.off('mouseup', addModelMouseUp);
+
+            $document.off('touchmove', addModelMouseMove);
+            $document.off('touchend', addModelMouseUp);
+            $document.off('touchcancel', addModelMouseUp);
           }
 
         })();

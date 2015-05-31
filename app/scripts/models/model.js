@@ -3,18 +3,18 @@
 angular.module('nerdproxyApp')
   .factory('Model', function (Ref, $timeout) {
 
-    function Model(modelData) {
+    function Model(modelId, modelData) {
       if (this.constructor === Model) {
         throw new Error("Tried to instantiate abstract class!");
       }
 
-      this.firebaseRef = Ref.child('game1/models/' + modelData.id);
+      this.firebaseRef = Ref.child('game1/models/' + modelId);
 
       this.firebaseRef.child('colour').on("value", function (snapshot) {
-        this.colour = snapshot.val();
+        this.colour = snapshot.val() || '#008000'; // default green;
 
         $timeout(function () {
-          this.snap.attr('fill', snapshot.val());
+          this.snap.attr('fill', this.colour);
         }.bind(this));
 
       }.bind(this));
@@ -39,7 +39,6 @@ angular.module('nerdproxyApp')
       startMove: abstractMethod,
       continueMove: abstractMethod,
       endMove: abstractMethod,
-      getSyncData: abstractMethod,
 
       select: function () {
         this.snap.addClass('selected');
@@ -77,8 +76,8 @@ angular.module('nerdproxyApp')
         } else {
           return getModelIdFromElement(element.parentElement);
         }
-
       }
+
     });
 
 

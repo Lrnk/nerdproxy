@@ -3,14 +3,13 @@
 angular.module('nerdproxyApp')
   .factory('Inf', function (BoardInfo, Model) {
 
-    function Inf(modelData) {
+    function Inf(modelId, modelData) {
 
-      Model.call(this, modelData);
+      Model.call(this, modelId, modelData);
 
-      this.id = modelData.id;
+      this.id = modelId;
       this.xCm = modelData.xCm;
       this.yCm = modelData.yCm;
-      this.colour = modelData.colour || 'green';
 
       var snap = BoardInfo.snap.circle(this.xCm, this.yCm, this.baseRadius);
       snap.addClass('model inf model-id-' + this.id);
@@ -80,16 +79,6 @@ angular.module('nerdproxyApp')
         });
         ghostSnap.remove();
         this.moveInProgress = undefined;
-      },
-
-      getSyncData: function () {
-        return {
-          id: this.id,
-          xCm: this.xCm,
-          yCm: this.yCm,
-          colour: this.colour,
-          type: 'inf'
-        }
       }
 
     });

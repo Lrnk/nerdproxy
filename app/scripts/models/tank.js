@@ -3,16 +3,14 @@
 angular.module('nerdproxyApp')
   .factory('Tank', function (BoardInfo, Model) {
 
-    function Tank(modelData) {
+    function Tank(modelId, modelData) {
 
-      Model.call(this, modelData);
+      Model.call(this, modelId, modelData);
 
-      this.id = Number(modelData.id);
+      this.id = modelId;
       this.xCm = Number(modelData.xCm);
       this.yCm = Number(modelData.yCm);
-      this.colour = modelData.colour || 'green';
-      this.rotation = Number(modelData.rotation);
-
+      this.rotation = Number(modelData.rotation || 0);
 
       var snap = BoardInfo.snap.group();
 
@@ -33,8 +31,8 @@ angular.module('nerdproxyApp')
       // overwrite colour value event
       this.firebaseRef.child('colour').off("value");
       this.firebaseRef.child('colour').on("value", function (snapshot) {
-        this.colour = snapshot.val();
-        this.snap.select('rect').attr('fill', snapshot.val());
+        this.colour = snapshot.val() || '#008000'; // default green;
+        this.snap.select('rect').attr('fill', this.colour);
       }.bind(this));
 
     }
@@ -153,17 +151,6 @@ angular.module('nerdproxyApp')
         return Model.prototype.getContextMenuItems.call(this).concat([
           'rotate'
         ]);
-      },
-
-      getSyncData: function () {
-        return {
-          id: this.id,
-          xCm: this.xCm,
-          yCm: this.yCm,
-          rotation: this.rotation,
-          type: 'tank',
-          colour: this.colour
-        }
       }
 
     });

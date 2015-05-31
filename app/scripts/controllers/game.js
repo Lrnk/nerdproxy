@@ -32,7 +32,7 @@ angular.module('nerdproxyApp')
 
       mode: Mode.DEFAULT,
 
-      models: []
+      models: {}
 
     };
 

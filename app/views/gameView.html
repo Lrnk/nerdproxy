@@ -7,13 +7,13 @@
 
   <div
     class="model-maker"
-    ng-if="stuff.mode === Mode.ADD_MODELS"
+    ng-class="{'not-showing': stuff.mode !== Mode.ADD_MODELS}"
     >
     <div class="model-picker">
       <select>
-        <option>Inf</option>
-        <option>Large inf</option>
-        <option>Tank</option>
+        <option name="inf">Inf</option>
+        <option name="largeInf">Large inf</option>
+        <option name="tank">Tank</option>
       </select>
     </div>
     <div class="spawning-pit">

@@ -38,6 +38,11 @@
   display: table;
 }
 
+.model-maker.not-showing {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .model-maker .model-picker {
   display: table-cell;
   vertical-align: middle;
