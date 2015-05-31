@@ -67,6 +67,14 @@
   outline: 1px solid red;
 }
 
+.chat-box .chatter * {
+  -webkit-user-select: auto;
+  -khtml-user-select: all;
+  -moz-user-select: all;
+  -ms-user-select: all;
+  user-select: all;
+}
+
 @media all and (orientation:landscape) {
 
   .chat-box {
@@ -130,6 +138,11 @@
 
 .dice-results {
   font-weight: bold;
+  display: block;
+}
+
+.individual-roll {
+  display: inline-block;
 }
 
 /*colour-picker*/

@@ -9,7 +9,7 @@
 
         <span ng-if="chat.type === 'roll'"><span class="chat-date">{{chat.time | chatDate}}</span> Rolled {{chat.numDice}} D{{chat.diceValue}}:
           <span class="dice-results">
-            <span ng-repeat="result in chat.results track by $index">&nbsp;{{result}}</span>
+            <span class="individual-roll" ng-repeat="result in chat.results track by $index">&nbsp;{{result}}</span>
           </span>
         </span>
 
