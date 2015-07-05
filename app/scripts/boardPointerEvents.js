@@ -13,11 +13,12 @@ angular.module('nerdproxyApp').
     /**
      *
      * @param pointerDownAction
+     * @param checkThisEvent
      * @param pointerMoveAction
      * @param pointerUpAction
      * @param options: spaceForThumb
      */
-    function addEvent(pointerDownAction, pointerMoveAction, pointerUpAction, options) {
+    function addEvent(pointerDownAction, checkThisEvent, pointerMoveAction, pointerUpAction, options) {
 
       options = options ? options: {};
 
@@ -26,23 +27,26 @@ angular.module('nerdproxyApp').
 
       function pointerDown(e) {
 
-        var pointerPosXPx = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-        var pointerPosYPx = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
+        if(checkThisEvent(e)) {
 
-        $document.on('mousemove', pointerMove);
-        $document.on('mouseup', pointerUp);
+          var pointerPosXPx = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
+          var pointerPosYPx = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
 
-        $document.on('touchmove', pointerMove);
-        $document.on('touchend', pointerUp);
-        $document.on('touchcancel', pointerUp);
+          $document.on('mousemove', pointerMove);
+          $document.on('mouseup', pointerUp);
 
+          $document.on('touchmove', pointerMove);
+          $document.on('touchend', pointerUp);
+          $document.on('touchcancel', pointerUp);
 
-        pointerDownAction(_.extend(e, {
+          pointerDownAction(_.extend(e, {
 
-          startPageXPx: pointerPosXPx - BoardInfo.getOffsetPx().left,
-          startPageYPx: pointerPosYPx - BoardInfo.getOffsetPx().top
+            startPageXPx: pointerPosXPx - BoardInfo.getOffsetPx().left,
+            startPageYPx: pointerPosYPx - BoardInfo.getOffsetPx().top
 
-        }));
+          }));
+
+        }
 
       }
 

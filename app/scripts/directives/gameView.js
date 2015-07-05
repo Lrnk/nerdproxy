@@ -149,18 +149,17 @@ angular.module('nerdproxyApp')
 
           var movingModels;
 
-          BoardPointerEvents.addEvent(modelMouseDown, modelMouseMove, modelMouseUp, {spaceForThumb: true});
+          BoardPointerEvents.addEvent(modelMouseDown, checkForModelMove, modelMouseMove, modelMouseUp, {spaceForThumb: true});
 
-          function modelMouseDown(e) {
+          function checkForModelMove(e) {
 
             if (!isElementOnBoard(e.target)) {
-              return;
+              return false;
             }
 
             // if we're in default mode, only move if we're clicking on a model, else unselect
             // if we're in move_select mode, accept the selection as is and move it
             // else do nothing
-
             if (stuff.mode === Mode.DEFAULT) {
               var modelId = Model.getModelIdFromElement(e.target);
               if (modelId !== undefined) {
@@ -180,11 +179,17 @@ angular.module('nerdproxyApp')
                   stuff.models[modelId].deselect();
                 });
                 stuff.selectedModelIds = [];
-                return;
+                return false;
               }
             } else if (stuff.mode !== Mode.MOVE_SELECTION) {
-              return;
+              return false;
             }
+
+            return true;
+
+          }
+
+          function modelMouseDown(e) {
 
             movingModels = _.map(stuff.selectedModelIds, function (modelId) {
               stuff.models[modelId].startMove(e.startPageXPx, e.startPageYPx);
@@ -217,58 +222,43 @@ angular.module('nerdproxyApp')
         (function initModelRotatingStuff() {
 
           var model;
-          var leftOffset;
-          var topOffset;
           var startAngleDegrees;
 
-          $document.on('mousedown', modelRotateMouseDown);
-          $document.on('touchstart', modelRotateMouseDown);
+          BoardPointerEvents.addEvent(modelRotateMouseDown, checkForRotate, modelRotateMouseMove, modelRotateMouseUp);
+
+          function checkForRotate() {
+
+            if (stuff.mode !== Mode.ROTATE) {
+              return false;
+            }
+
+            if (stuff.selectedModelIds.length !== 1) {
+              console.log('invalid number of models selected: ' + stuff.selectedModelIds.length);
+              return false;
+            }
+
+            return true;
+
+          }
 
           function modelRotateMouseDown(e) {
 
-            if (stuff.mode !== Mode.ROTATE) {
-              return;
-            }
-            if (stuff.selectedModelIds.length !== 1) {
-              console.log('invalid number of models selected: ' + stuff.selectedModelIds.length);
-              return;
-            }
-
             model = stuff.models[stuff.selectedModelIds[0]];
 
-            leftOffset = element[0].offsetLeft + gameScroll.x;
-            topOffset = element[0].offsetTop + gameScroll.y;
-
-            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
-
-            var startPageXPx = pointerPosX - leftOffset;
-            var startPageYPx = pointerPosY - topOffset;
-
-            var xDistFromModelCm = model.xCm - BoardInfo.pxToCm(startPageXPx);
-            var yDistFromModelCm = model.yCm - BoardInfo.pxToCm(startPageYPx);
+            var xDistFromModelCm = model.xCm - BoardInfo.pxToCm(e.startPageXPx);
+            var yDistFromModelCm = model.yCm - BoardInfo.pxToCm(e.startPageYPx);
 
             var angleRadians = Math.atan(yDistFromModelCm / xDistFromModelCm);
             startAngleDegrees = angleRadians * (180 / Math.PI);
 
             model.startRotation();
 
-            $document.on('mousemove', modelRotateMouseMove);
-            $document.on('mouseup', modelRotateMouseUp);
-
-            $document.on('touchmove', modelRotateMouseMove);
-            $document.on('touchend', modelRotateMouseUp);
-            $document.on('touchcancel', modelRotateMouseUp);
-
           }
 
           function modelRotateMouseMove(e) {
 
-            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
-
-            var xDistFromModelCm = model.xCm - BoardInfo.pxToCm(pointerPosX - leftOffset);
-            var yDistFromModelCm = model.yCm - BoardInfo.pxToCm(pointerPosY - topOffset);
+            var xDistFromModelCm = model.xCm - BoardInfo.pxToCm(e.pointerPosXPx);
+            var yDistFromModelCm = model.yCm - BoardInfo.pxToCm(e.pointerPosYPx);
 
             var angleRadians = Math.atan(yDistFromModelCm / xDistFromModelCm);
             var angleDegrees = angleRadians * (180 / Math.PI);
@@ -280,15 +270,8 @@ angular.module('nerdproxyApp')
           function modelRotateMouseUp() {
 
             model.endRotation();
-
-            $document.off('mousemove', modelRotateMouseMove);
-            $document.off('mouseup', modelRotateMouseUp);
-
-            $document.off('touchmove', modelRotateMouseMove);
-            $document.off('touchend', modelRotateMouseUp);
-            $document.off('touchcancel', modelRotateMouseUp);
-
             scope.$apply();
+
           }
 
         })();
