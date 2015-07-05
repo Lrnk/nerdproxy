@@ -15,17 +15,33 @@ angular.module('nerdproxyApp').
 
       zoomFactor: 1,
       snap: undefined, // set by gameview directive
+      gameScroll: undefined, // set by gameview directive
 
-      pxToCm: pxToCm
+      setGameScroll: setGameScroll,
+      pxToCm: pxToCm,
+      getOffsetPx: getOffsetPx
 
     };
 
     return boardInfo;
 
 
-
     function pxToCm(px) {
       return px * ((boardInfo.widthCm / boardInfo.widthPx) / boardInfo.zoomFactor);
+    }
+
+    function setGameScroll(_gameScroll_) {
+      boardInfo.gameScroll = _gameScroll_;
+    }
+
+    function getOffsetPx() {
+
+      var boardWrapperElem = $('.game-view-wrapper')[0];
+
+      return {
+        left: boardWrapperElem.offsetLeft + boardInfo.gameScroll.x,
+        top: boardWrapperElem.offsetTop + boardInfo.gameScroll.y
+      }
     }
 
   });

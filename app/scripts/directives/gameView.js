@@ -7,7 +7,7 @@
  * # gameControls
  */
 angular.module('nerdproxyApp')
-  .directive('gameView', function ($rootScope, $document, $timeout, $window, Model, Inf, LargeInf, Tank, Mode, BoardInfo, Ref) {
+  .directive('gameView', function ($rootScope, $document, $timeout, $window, Model, Inf, LargeInf, Tank, Mode, BoardInfo, BoardPointerEvents, Ref) {
     return {
       restrict: 'E',
       templateUrl: 'views/gameView.html',
@@ -38,6 +38,22 @@ angular.module('nerdproxyApp')
           momentum: false
         });
 
+        BoardInfo.setGameScroll(gameScroll);
+
+        scope.$watch('BoardInfo.zoomFactor', function (newVal) {
+          if (newVal) {
+            gameScroll.refresh();
+          }
+        });
+
+        scope.$watch('stuff.mode', function () {
+          if (stuff.mode === Mode.MOVE_VIEW) {
+            gameScroll.enable();
+          } else {
+            gameScroll.disable();
+          }
+        });
+
         var hammertime = new Hammer(element[0]);
         hammertime.get('pinch').set({enable: true});
 
@@ -66,12 +82,6 @@ angular.module('nerdproxyApp')
           })
         }
 
-        scope.$watch('BoardInfo.zoomFactor', function (newVal) {
-          if (newVal) {
-            gameScroll.refresh();
-          }
-        });
-
         refreshWindowSize();
 
         angular.element($window).on('resize', function () {
@@ -97,15 +107,6 @@ angular.module('nerdproxyApp')
           BoardInfo.widthPx = Math.min(BoardInfo.widthPx, BoardInfo.heightPx / point6Recurring);
           BoardInfo.heightPx = Math.min(BoardInfo.heightPx, BoardInfo.widthPx * point6Recurring);
         }
-
-
-        scope.$watch('stuff.mode', function () {
-          if (stuff.mode === Mode.MOVE_VIEW) {
-            gameScroll.enable();
-          } else {
-            gameScroll.disable();
-          }
-        });
 
 
         // get models
@@ -146,16 +147,9 @@ angular.module('nerdproxyApp')
 
         (function initModelMovingStuff() {
 
-          var startPageXPx;
-          var startPageYPx;
-          var leftOffset;
-          var topOffset;
-          var spaceForThumb = 50;
-
           var movingModels;
 
-          $document.on('mousedown', modelMouseDown);
-          $document.on('touchstart', modelMouseDown);
+          BoardPointerEvents.addEvent(modelMouseDown, modelMouseMove, modelMouseUp, {spaceForThumb: true});
 
           function modelMouseDown(e) {
 
@@ -192,37 +186,17 @@ angular.module('nerdproxyApp')
               return;
             }
 
-            leftOffset = element[0].offsetLeft + gameScroll.x;
-            topOffset = element[0].offsetTop + gameScroll.y;
-
-            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
-
-            startPageXPx = pointerPosX - leftOffset;
-            startPageYPx = pointerPosY - topOffset;
-
             movingModels = _.map(stuff.selectedModelIds, function (modelId) {
-              stuff.models[modelId].startMove(startPageXPx, startPageYPx);
+              stuff.models[modelId].startMove(e.startPageXPx, e.startPageYPx);
               return stuff.models[modelId];
             });
-
-
-            $document.on('mousemove', modelMouseMove);
-            $document.on('mouseup', modelMouseUp);
-
-            $document.on('touchmove', modelMouseMove);
-            $document.on('touchend', modelMouseUp);
-            $document.on('touchcancel', modelMouseUp);
 
           }
 
           function modelMouseMove(e) {
 
-            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - (stuff.mode !== Mode.MOVE_SELECTION ? spaceForThumb : 0) : e.pageY;
-
             angular.forEach(movingModels, function (movingModel) {
-              movingModel.continueMove((pointerPosX - leftOffset), (pointerPosY - topOffset));
+              movingModel.continueMove(e.pointerPosXPx, e.pointerPosYPx);
             });
 
           }
@@ -234,13 +208,6 @@ angular.module('nerdproxyApp')
             });
 
             movingModels = [];
-            $document.off('mousemove', modelMouseMove);
-            $document.off('mouseup', modelMouseUp);
-
-            $document.off('touchmove', modelMouseMove);
-            $document.off('touchend', modelMouseUp);
-            $document.off('touchcancel', modelMouseUp);
-
             scope.$apply();
           }
 
