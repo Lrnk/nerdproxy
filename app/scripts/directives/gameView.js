@@ -419,58 +419,18 @@ angular.module('nerdproxyApp')
           var spawningPit = $('.spawning-pit');
           var modelType;
 
-          $document.on('mousedown', addModelMouseDown);
-          $document.on('touchstart', addModelMouseDown);
+          BoardPointerEvents.addEvent(addModelMouseDown, checkForAddModel, addModelMouseMove, addModelMouseUp, {spaceForThumbMove: true});
 
-          function addModelMouseDown(e) {
+          function checkForAddModel(e) {
+            return stuff.mode === Mode.ADD_MODELS && spawningPit.has($(e.target)).length;
+          }
 
-            if (stuff.mode !== Mode.ADD_MODELS) {
-              return;
-            }
-            if (!spawningPit.has($(e.target)).length) {
-              return;
-            }
-
+          function addModelMouseDown() {
             modelType = $('.model-picker').find(":selected").attr('name');
-
-            $document.on('mousemove', addModelMouseMove);
-            $document.on('mouseup', addModelMouseUp);
-
-            $document.on('touchmove', addModelMouseMove);
-            $document.on('touchend', addModelMouseUp);
-            $document.on('touchcancel', addModelMouseUp);
-
           }
 
           function addModelMouseMove(e) {
-
-            //var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            //var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
-            //
-            //var posChangeXCm = startXCm - BoardInfo.pxToCm(pointerPosX - leftOffset);
-            //var posChangeYCm = startYCm - BoardInfo.pxToCm(pointerPosY - topOffset);
-            //
-            //var x = Math.min(startXCm, startXCm - posChangeXCm);
-            //var y = Math.min(startYCm, startYCm - posChangeYCm);
-            //var w = Math.abs(posChangeXCm);
-            //var h = Math.abs(posChangeYCm);
-            //
-            //selectBoxSnap.attr({
-            //  'x': x,
-            //  'y': y,
-            //  'width': w,
-            //  'height': h
-            //});
-            //
-            //modelsWithin = [];
-            //angular.forEach(stuff.models, function (model) {
-            //  if (model.xCm > x && model.xCm < (x + w) && model.yCm > y && model.yCm < (y + h)) {
-            //    modelsWithin.push(model);
-            //    model.select();
-            //  } else {
-            //    model.deselect();
-            //  }
-            //});
+            // todo make it draggable
           }
 
           function addModelMouseUp() {
@@ -483,13 +443,6 @@ angular.module('nerdproxyApp')
             newModelRef.update({
               id: newModelRef.key()
             });
-
-            $document.off('mousemove', addModelMouseMove);
-            $document.off('mouseup', addModelMouseUp);
-
-            $document.off('touchmove', addModelMouseMove);
-            $document.off('touchend', addModelMouseUp);
-            $document.off('touchcancel', addModelMouseUp);
           }
 
         })();
