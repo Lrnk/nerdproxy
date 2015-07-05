@@ -25,8 +25,8 @@ angular.module('nerdproxyApp').
       $document.on('mousedown', pointerDown);
       $document.on('touchstart', pointerDown);
 
-      var startPageXPx;
-      var startPageYPx;
+      var startXPx;
+      var startYPx;
 
       function pointerDown(e) {
 
@@ -48,13 +48,16 @@ angular.module('nerdproxyApp').
           $document.on('touchend', pointerUp);
           $document.on('touchcancel', pointerUp);
 
-          startPageXPx = pointerPosXPx - BoardInfo.getOffsetPx().left;
-          startPageYPx = pointerPosYPx - BoardInfo.getOffsetPx().top;
+          startXPx = pointerPosXPx - BoardInfo.getOffsetPx().left;
+          startYPx = pointerPosYPx - BoardInfo.getOffsetPx().top;
 
           pointerDownAction(_.extend(e, {
 
-            startPageXPx: startPageXPx,
-            startPageYPx: startPageYPx
+            startXPx: startXPx,
+            startYPx: startYPx,
+
+            startXCm: BoardInfo.pxToCm(startXPx),
+            startYCm: BoardInfo.pxToCm(startYPx)
 
           }));
 
@@ -78,11 +81,23 @@ angular.module('nerdproxyApp').
 
         pointerMoveAction(_.extend(e, {
 
-          posChangeXPx: startPageXPx - (pointerPosXPx - offsetLeft),
-          posChangeYPx: startPageYPx - (pointerPosYPx - offsetTop),
+          posChangeXPx: startXPx - (pointerPosXPx - offsetLeft),
+          posChangeYPx: startYPx - (pointerPosYPx - offsetTop),
+
+          posChangeXCm: BoardInfo.pxToCm(startXPx - (pointerPosXPx - offsetLeft)),
+          posChangeYCm: BoardInfo.pxToCm(startYPx - (pointerPosYPx - offsetTop)),
 
           pointerPosXPx: pointerPosXPx - offsetLeft,
-          pointerPosYPx: pointerPosYPx - offsetTop
+          pointerPosYPx: pointerPosYPx - offsetTop,
+
+          pointerPosXCm: BoardInfo.pxToCm(pointerPosXPx - offsetLeft),
+          pointerPosYCm: BoardInfo.pxToCm(pointerPosYPx - offsetTop),
+
+          startXPx: startXPx,
+          startYPx: startYPx,
+
+          startXCm: BoardInfo.pxToCm(startXPx),
+          startYCm: BoardInfo.pxToCm(startYPx)
 
         }));
 

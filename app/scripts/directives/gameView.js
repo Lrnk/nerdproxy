@@ -192,7 +192,7 @@ angular.module('nerdproxyApp')
           function modelMouseDown(e) {
 
             movingModels = _.map(stuff.selectedModelIds, function (modelId) {
-              stuff.models[modelId].startMove(e.startPageXPx, e.startPageYPx);
+              stuff.models[modelId].startMove(e.startXPx, e.startYPx);
               return stuff.models[modelId];
             });
 
@@ -245,8 +245,8 @@ angular.module('nerdproxyApp')
 
             model = stuff.models[stuff.selectedModelIds[0]];
 
-            var xDistFromModelCm = model.xCm - BoardInfo.pxToCm(e.startPageXPx);
-            var yDistFromModelCm = model.yCm - BoardInfo.pxToCm(e.startPageYPx);
+            var xDistFromModelCm = model.xCm - e.startXCm;
+            var yDistFromModelCm = model.yCm - e.startYCm;
 
             var angleRadians = Math.atan(yDistFromModelCm / xDistFromModelCm);
             startAngleDegrees = angleRadians * (180 / Math.PI);
@@ -257,8 +257,8 @@ angular.module('nerdproxyApp')
 
           function modelRotateMouseMove(e) {
 
-            var xDistFromModelCm = model.xCm - BoardInfo.pxToCm(e.pointerPosXPx);
-            var yDistFromModelCm = model.yCm - BoardInfo.pxToCm(e.pointerPosYPx);
+            var xDistFromModelCm = model.xCm - e.pointerPosXCm;
+            var yDistFromModelCm = model.yCm - e.pointerPosYCm;
 
             var angleRadians = Math.atan(yDistFromModelCm / xDistFromModelCm);
             var angleDegrees = angleRadians * (180 / Math.PI);
@@ -295,10 +295,10 @@ angular.module('nerdproxyApp')
           function rangeCheckMouseDown(e) {
 
             range = {
-              x1Cm: BoardInfo.pxToCm(e.startPageXPx),
-              y1Cm: BoardInfo.pxToCm(e.startPageYPx),
-              x2Cm: BoardInfo.pxToCm(e.startPageXPx),
-              y2Cm: BoardInfo.pxToCm(e.startPageYPx),
+              x1Cm: BoardInfo.pxToCm(e.startXPx),
+              y1Cm: BoardInfo.pxToCm(e.startYPx),
+              x2Cm: BoardInfo.pxToCm(e.startXPx),
+              y2Cm: BoardInfo.pxToCm(e.startYPx),
               infoText: '0.0'
             };
 
@@ -311,8 +311,8 @@ angular.module('nerdproxyApp')
             var lengthPx = Math.sqrt(e.posChangeXPx * e.posChangeXPx + e.posChangeYPx * e.posChangeYPx);
             var lengthInches = BoardInfo.pxToCm(lengthPx) * 0.393700787;
 
-            range.x2Cm = range.x1Cm - BoardInfo.pxToCm(e.posChangeXPx);
-            range.y2Cm = range.y1Cm - BoardInfo.pxToCm(e.posChangeYPx);
+            range.x2Cm = range.x1Cm - e.posChangeXCm;
+            range.y2Cm = range.y1Cm - e.posChangeYCm;
             range.infoText = lengthInches.toFixed(1);
 
             drawRangeLine(range);
@@ -343,64 +343,42 @@ angular.module('nerdproxyApp')
 
         (function initModelSelectionStuff() {
 
-          var startXCm;
-          var startYCm;
-          var leftOffset;
-          var topOffset;
           var selectBoxSnap;
           var modelsWithin;
 
-          $document.on('mousedown', selectBoxMouseDown);
-          $document.on('touchstart', selectBoxMouseDown);
+          BoardPointerEvents.addEvent(dragSelectMouseDown, checkForDragSelect, dragSelectMouseMove, dragSelectMouseUp, {spaceForThumbStart: true,  spaceForThumbMove: true});
 
-          function selectBoxMouseDown(e) {
-
+          function checkForDragSelect(e) {
             if (stuff.mode !== Mode.DEFAULT) {
-              return;
+              return false;
             }
             if (!isElementOnBoard(e.target)) {
-              return;
+              return false;
             }
+            // if we're clicking on a model, don't start a drag
             if (Model.getModelIdFromElement(e.target) !== undefined) {
               scope.$broadcast('modelSelection');
-              return;
+              return false;
             }
 
-            leftOffset = element[0].offsetLeft + gameScroll.x;
-            topOffset = element[0].offsetTop + gameScroll.y;
+            return true;
+          }
 
-            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
+          function dragSelectMouseDown(e) {
 
-            startXCm = BoardInfo.pxToCm(pointerPosX - leftOffset);
-            startYCm = BoardInfo.pxToCm(pointerPosY - topOffset);
-
-            selectBoxSnap = BoardInfo.snap.rect(startXCm, startYCm, 0, 0);
+            selectBoxSnap = BoardInfo.snap.rect(e.startXCm, e.startYCm, 0, 0);
             selectBoxSnap.addClass('select-box');
 
             modelsWithin = [];
 
-            $document.on('mousemove', selectBoxMouseMove);
-            $document.on('mouseup', selectBoxMouseUp);
-
-            $document.on('touchmove', selectBoxMouseMove);
-            $document.on('touchend', selectBoxMouseUp);
-            $document.on('touchcancel', selectBoxMouseUp);
-
           }
 
-          function selectBoxMouseMove(e) {
+          function dragSelectMouseMove(e) {
 
-            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
-
-            var posChangeXCm = startXCm - BoardInfo.pxToCm(pointerPosX - leftOffset);
-            var posChangeYCm = startYCm - BoardInfo.pxToCm(pointerPosY - topOffset);
-
-            var x = Math.min(startXCm, startXCm - posChangeXCm);
-            var y = Math.min(startYCm, startYCm - posChangeYCm);
-            var w = Math.abs(posChangeXCm);
-            var h = Math.abs(posChangeYCm);
+            var x = Math.min(e.startXCm, e.startXCm - e.posChangeXCm);
+            var y = Math.min(e.startYCm, e.startYCm - e.posChangeYCm);
+            var w = Math.abs(e.posChangeXCm);
+            var h = Math.abs(e.posChangeYCm);
 
             selectBoxSnap.attr({
               'x': x,
@@ -420,7 +398,7 @@ angular.module('nerdproxyApp')
             });
           }
 
-          function selectBoxMouseUp() {
+          function dragSelectMouseUp() {
 
             selectBoxSnap.remove();
 
@@ -429,13 +407,6 @@ angular.module('nerdproxyApp')
             });
 
             scope.$broadcast('modelSelection');
-
-            $document.off('mousemove', selectBoxMouseMove);
-            $document.off('mouseup', selectBoxMouseUp);
-
-            $document.off('touchmove', selectBoxMouseMove);
-            $document.off('touchend', selectBoxMouseUp);
-            $document.off('touchcancel', selectBoxMouseUp);
 
             scope.$apply();
           }
