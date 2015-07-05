@@ -16,21 +16,30 @@ angular.module('nerdproxyApp').
      * @param checkThisEvent
      * @param pointerMoveAction
      * @param pointerUpAction
-     * @param options: spaceForThumb
+     * @param options: spaceForThumbStart, spaceForThumbMove
      */
     function addEvent(pointerDownAction, checkThisEvent, pointerMoveAction, pointerUpAction, options) {
 
-      options = options ? options: {};
+      options = options ? options : {};
 
       $document.on('mousedown', pointerDown);
       $document.on('touchstart', pointerDown);
 
+      var startPageXPx;
+      var startPageYPx;
+
       function pointerDown(e) {
 
-        if(checkThisEvent(e)) {
+        if (checkThisEvent(e)) {
 
           var pointerPosXPx = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-          var pointerPosYPx = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
+          var pointerPosYPx;
+
+          if (options.spaceForThumbStart) {
+            pointerPosYPx = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb : e.pageY;
+          } else {
+            pointerPosYPx = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
+          }
 
           $document.on('mousemove', pointerMove);
           $document.on('mouseup', pointerUp);
@@ -39,10 +48,13 @@ angular.module('nerdproxyApp').
           $document.on('touchend', pointerUp);
           $document.on('touchcancel', pointerUp);
 
+          startPageXPx = pointerPosXPx - BoardInfo.getOffsetPx().left;
+          startPageYPx = pointerPosYPx - BoardInfo.getOffsetPx().top;
+
           pointerDownAction(_.extend(e, {
 
-            startPageXPx: pointerPosXPx - BoardInfo.getOffsetPx().left,
-            startPageYPx: pointerPosYPx - BoardInfo.getOffsetPx().top
+            startPageXPx: startPageXPx,
+            startPageYPx: startPageYPx
 
           }));
 
@@ -52,10 +64,13 @@ angular.module('nerdproxyApp').
 
       function pointerMove(e) {
 
+        var offsetLeft = BoardInfo.getOffsetPx().left;
+        var offsetTop = BoardInfo.getOffsetPx().top;
+
         var pointerPosXPx = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
         var pointerPosYPx;
 
-        if(options.spaceForThumb) {
+        if (options.spaceForThumbMove) {
           pointerPosYPx = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb : e.pageY;
         } else {
           pointerPosYPx = e.originalEvent.touches ? e.originalEvent.touches[0].clientY : e.pageY;
@@ -63,8 +78,11 @@ angular.module('nerdproxyApp').
 
         pointerMoveAction(_.extend(e, {
 
-          pointerPosXPx: pointerPosXPx - BoardInfo.getOffsetPx().left,
-          pointerPosYPx: pointerPosYPx - BoardInfo.getOffsetPx().top
+          posChangeXPx: startPageXPx - (pointerPosXPx - offsetLeft),
+          posChangeYPx: startPageYPx - (pointerPosYPx - offsetTop),
+
+          pointerPosXPx: pointerPosXPx - offsetLeft,
+          pointerPosYPx: pointerPosYPx - offsetTop
 
         }));
 

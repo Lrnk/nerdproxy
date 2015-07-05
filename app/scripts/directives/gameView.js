@@ -149,7 +149,7 @@ angular.module('nerdproxyApp')
 
           var movingModels;
 
-          BoardPointerEvents.addEvent(modelMouseDown, checkForModelMove, modelMouseMove, modelMouseUp, {spaceForThumb: true});
+          BoardPointerEvents.addEvent(modelMouseDown, checkForModelMove, modelMouseMove, modelMouseUp, {spaceForThumbMove: true});
 
           function checkForModelMove(e) {
 
@@ -280,50 +280,25 @@ angular.module('nerdproxyApp')
         (function initRangeCheckingStuff() {
 
           var firebaseRef = Ref.child('game1/range');
-          var startPageXPx;
-          var startPageYPx;
-          var leftOffset;
-          var topOffset;
           var range;
-          var spaceForThumb = 50;
 
-          $document.on('mousedown', rangeCheckMouseDown);
-          $document.on('touchstart', rangeCheckMouseDown);
+          BoardPointerEvents.addEvent(rangeCheckMouseDown, checkForRangeCheck, rangeCheckMouseMove, rangeCheckMouseUp, {spaceForThumbStart: true,  spaceForThumbMove: true});
 
           firebaseRef.on('value', function (snapshot) {
             drawRangeLine(snapshot.val());
           });
 
+          function checkForRangeCheck(e) {
+            return stuff.mode === Mode.RANGE && isElementOnBoard(e.target);
+          }
+
           function rangeCheckMouseDown(e) {
 
-            if (stuff.mode !== Mode.RANGE) {
-              return;
-            }
-            if (!isElementOnBoard(e.target)) {
-              return;
-            }
-
-            leftOffset = element[0].offsetLeft + gameScroll.x;
-            topOffset = element[0].offsetTop + gameScroll.y;
-
-            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb : e.pageY;
-
-            startPageXPx = pointerPosX - leftOffset;
-            startPageYPx = pointerPosY - topOffset;
-
-            $document.on('mousemove', rangeCheckMouseMove);
-            $document.on('mouseup', rangeCheckMouseUp);
-
-            $document.on('touchmove', rangeCheckMouseMove);
-            $document.on('touchend', rangeCheckMouseUp);
-            $document.on('touchcancel', rangeCheckMouseUp);
-
             range = {
-              x1Cm: BoardInfo.pxToCm(startPageXPx),
-              y1Cm: BoardInfo.pxToCm(startPageYPx),
-              x2Cm: BoardInfo.pxToCm(startPageXPx),
-              y2Cm: BoardInfo.pxToCm(startPageYPx),
+              x1Cm: BoardInfo.pxToCm(e.startPageXPx),
+              y1Cm: BoardInfo.pxToCm(e.startPageYPx),
+              x2Cm: BoardInfo.pxToCm(e.startPageXPx),
+              y2Cm: BoardInfo.pxToCm(e.startPageYPx),
               infoText: '0.0'
             };
 
@@ -333,32 +308,17 @@ angular.module('nerdproxyApp')
 
           function rangeCheckMouseMove(e) {
 
-            var pointerPosX = e.originalEvent.touches ? e.originalEvent.touches[0].clientX : e.pageX;
-            var pointerPosY = e.originalEvent.touches ? e.originalEvent.touches[0].clientY - spaceForThumb : e.pageY;
-
-            var posChangeXPx = startPageXPx - (pointerPosX - leftOffset);
-            var posChangeYPx = startPageYPx - (pointerPosY - topOffset);
-
-
-            var lengthPx = Math.sqrt(posChangeXPx * posChangeXPx + posChangeYPx * posChangeYPx);
+            var lengthPx = Math.sqrt(e.posChangeXPx * e.posChangeXPx + e.posChangeYPx * e.posChangeYPx);
             var lengthInches = BoardInfo.pxToCm(lengthPx) * 0.393700787;
 
-            range.x2Cm = range.x1Cm - BoardInfo.pxToCm(posChangeXPx);
-            range.y2Cm = range.y1Cm - BoardInfo.pxToCm(posChangeYPx);
+            range.x2Cm = range.x1Cm - BoardInfo.pxToCm(e.posChangeXPx);
+            range.y2Cm = range.y1Cm - BoardInfo.pxToCm(e.posChangeYPx);
             range.infoText = lengthInches.toFixed(1);
 
             drawRangeLine(range);
           }
 
           function rangeCheckMouseUp() {
-            // end move
-            $document.off('mousemove', rangeCheckMouseMove);
-            $document.off('mouseup', rangeCheckMouseUp);
-
-            $document.off('touchmove', rangeCheckMouseMove);
-            $document.off('touchend', rangeCheckMouseUp);
-            $document.off('touchcancel', rangeCheckMouseUp);
-
             firebaseRef.set(range);
           }
 
